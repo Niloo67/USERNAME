@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "trends": {
+      "url": "https://mcp.trendsmcp.ai/mcp"
+    },
+    "resend": {
+      "url": "https://mcp.resend.com/mcp",
+      "headers": {
+        "Authorization": "Bearer re_YOUR_RESEND_API_KEY"
+      }
+    },
+    "grok-x": {
+      "command": "npx",
+      "args": ["-y", "grok-x-search-mcp"],
+      "env": {
+        "XAI_API_KEY": "xai-YOUR_KEY"
+      }
+    },
+    "financial": {
+      "command": "npx",
+      "args": ["-y", "financial-mcp"],
+      "env": {}
+    }
+  }
+}
