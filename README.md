@@ -28,12 +28,7 @@ Details: `.cursor/skills/portfolio-digest/references/mcp-stack.md`
 
 ## Quick start (email digests)
 
-1. Copy `.cursor/mcp.json.example` → configure real API keys in Cursor **Settings → MCP** (and on the Automation’s MCP tools).
-2. Open [cursor.com/automations](https://cursor.com/automations) (or run `/automate` in Cursor).
-3. Paste the prompt from `automations/weekly-portfolio-digest.md`.
-4. Add schedules: **Wednesday morning** + **Friday after close** (US market).
-5. Enable **Memories**, attach MCPs, point email to your address.
-6. Click **Test run** once.
+**Follow [`SETUP.md`](SETUP.md)** — keys, MCP config, and a ready `/automate` paste.
 
 ## Target risk profile
 

@@ -34,14 +34,21 @@ Add to Cursor Settings → MCP (or automation MCP tools). Replace API keys.
 ```json
 {
   "mcpServers": {
-    "trends": {
-      "url": "https://mcp.trendsmcp.ai/mcp"
+    "trends-mcp": {
+      "url": "https://api.trendsmcp.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TRENDS_KEY"
+      }
     },
     "resend": {
       "url": "https://mcp.resend.com/mcp",
       "headers": {
         "Authorization": "Bearer re_YOUR_KEY"
       }
+    },
+    "financial-mcp": {
+      "command": "uvx",
+      "args": ["financial-mcp-server"]
     },
     "grok-x": {
       "command": "npx",
@@ -54,7 +61,7 @@ Add to Cursor Settings → MCP (or automation MCP tools). Replace API keys.
 }
 ```
 
-> Exact Trends MCP URL / auth may change — confirm at [trendsmcp.ai](https://trendsmcp.ai). FinancialMCP / yfinance servers usually run via `npx` or `uvx` per their READMEs.
+> See [`SETUP.md`](../../../../SETUP.md) for the full activation path. Trends free tier: 100 req/mo at [trendsmcp.ai](https://trendsmcp.ai).
 
 ## Cost notes
 
