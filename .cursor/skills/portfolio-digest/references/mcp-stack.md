@@ -1,5 +1,7 @@
 # Recommended MCP / agent stack
 
+Full doctrine: [`knowledge-base/`](../../../../knowledge-base/README.md) (setup patterns, sources, people, signal rules).
+
 ## Must-have (balanced research + email)
 
 | Layer | Tool | Why |

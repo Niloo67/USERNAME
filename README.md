@@ -6,10 +6,17 @@ Uses Google Trends / multi-source trends, X (Twitter) mention sentiment, market 
 
 > Not financial advice. Educational research workflow only.
 
+## Start here
+
+1. **[`knowledge-base/`](knowledge-base/README.md)** — successful setups, best sources, people to follow, signal rules, architecture  
+2. **[`SETUP.md`](SETUP.md)** — activate Wed/Fri emails (API keys + `/automate`)  
+3. **`.cursor/skills/portfolio-digest/`** — what the agent does each run  
+
 ## What’s in this repo
 
 | Path | Purpose |
 |------|---------|
+| `knowledge-base/` | Durable doctrine: sources, educators, signal philosophy, system design |
 | `.cursor/skills/portfolio-digest/` | Agent skill: scoring, sleeves, email template |
 | `automations/weekly-portfolio-digest.md` | Ready-to-paste Cursor Automation config |
 | `.cursor/mcp.json.example` | Example MCP wiring (Trends, X/Grok, market data, Resend) |
