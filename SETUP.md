@@ -1,5 +1,7 @@
 # Activate your Wed + Fri portfolio emails
 
+**Before this:** skim [`knowledge-base/README.md`](knowledge-base/README.md) so the system’s sources and rules are clear.
+
 Do these steps in order. About 10 minutes. You need a **paid Cursor plan** (Cloud Agents / Automations).
 
 ## 1) Get free API keys

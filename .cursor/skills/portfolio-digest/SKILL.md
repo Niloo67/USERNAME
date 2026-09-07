@@ -7,6 +7,18 @@ description: Produce midweek and end-of-week balanced portfolio digests using Go
 
 Research what looks attractive to buy or hold for a **growth-balanced** investor in their 30s (moderate risk: enough equity growth to compound, not meme-stock / options speculation). Deliver a clear email-ready summary.
 
+## Knowledge base (load first)
+
+Before scoring ideas, read and follow:
+
+- `knowledge-base/00-executive-research-brief.md` — setup + source priorities
+- `knowledge-base/04-signal-philosophy.md` — Trends/X are attention sensors, not buy signals
+- `knowledge-base/02-data-sources.md` — Tier 1–2 for facts; Tier 3 for attention
+- `knowledge-base/05-architecture.md` — locked allocation policy
+- `knowledge-base/03-people-to-follow.md` — evidence-based framing (Felix / Bogleheads / Damodaran)
+
+If paths differ (no-repo automation), apply the same hierarchy from memory: **allocation → regime → fundamentals → price → Trends/X**.
+
 ## Investor profile (default)
 
 - Age band: 30s; horizon 10–30 years
