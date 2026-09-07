@@ -11,6 +11,7 @@ Research what looks attractive to buy or hold for a **growth-balanced** investor
 
 Before scoring ideas, read and follow:
 
+- `knowledge-base/00-executive-research-brief.md` — setup + source priorities
 - `knowledge-base/04-signal-philosophy.md` — Trends/X are attention sensors, not buy signals
 - `knowledge-base/02-data-sources.md` — Tier 1–2 for facts; Tier 3 for attention
 - `knowledge-base/05-architecture.md` — locked allocation policy

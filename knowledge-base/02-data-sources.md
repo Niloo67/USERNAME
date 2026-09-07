@@ -19,11 +19,15 @@ Prioritize **primary** sources, then reputable aggregators. Use social/trends la
 | **Yahoo Finance** | Quotes, history, basic fundamentals, news | Free; good agent default |
 | **Google Finance** | Quick quotes / comparison | Cross-check |
 | **TradingView** | Charts, breadth, idea discovery | Free tier enough; treat “ideas” as social |
-| **Finviz** | Screening (value, momentum, sector) | Strong free US screener |
+| **Finviz** | Screening (value, momentum, sector), heatmaps | Best free US visual scan |
+| **Koyfin** | Deep fundamentals, estimates, global screen | Strong free/paid research terminal |
+| **TIKR** | Filings-friendly research | Good free fundamental deep-dives |
 | **Macrotrends** | Long fundamental history | Good for multi-year context |
 | **StockAnalysis.com** | Clean statements / peers | Free tier useful |
-| **Alpha Vantage** | Cleaner time series / indicators | Free tier rate-limited |
+| **Alpha Vantage** | Cleaner time series / indicators / news | Free tier rate-limited; official MCP |
+| **EODHD** | Prices + news (popular in n8n digests) | Stable APIs for automation |
 | **Finnhub** | News, earnings, basics | Free tier available |
+| **Nasdaq Data Link** | Structured historical / alt datasets | When Yahoo isn’t enough |
 
 ## Tier 3 — Attention & narrative (Google Trends + X)
 
@@ -40,10 +44,12 @@ Prioritize **primary** sources, then reputable aggregators. Use social/trends la
 | Source | Why |
 |--------|-----|
 | **Bogleheads wiki / forum** | Evidence-based allocation, costs, behavior |
+| **Bogleheads start-up kit** | Best first read for a 30s DIY investor |
 | **Aswath Damodaran data** (NYU Stern) | Equity risk premiums, industry betas, valuation datasets |
-| **SSRNs / academic papers** | When checking a “strategy” claim |
+| **SSRNs / academic papers** | When checking a “strategy” claim (e.g. Trends predictability) |
 | **Broker research** (Vanguard, Fidelity, Schwab) | Asset allocation frameworks |
-| **Institutional outlooks** (Amundi, JPM, HSBC, VanEck) | Regime narratives — always cross-check vs price |
+| **Institutional outlooks** (Amundi, JPM, HSBC, VanEck, Franklin) | Regime narratives — always cross-check vs price |
+| **Rob Berger / Doughroller tools** | Practical DIY portfolio tracking literacy |
 
 ## MCP / API stack mapped to tiers
 

@@ -20,9 +20,11 @@ Steps 5 **never** override steps 1–3. Attention only ranks *what to investigat
 
 **Not reliable alone for:** predicting next-week returns. Academic work shows:
 
-- Keyword choice dominates results; random finance keywords often add no edge
-- Data are **relative** (0–100), revised, and biased toward Google users
-- Search spikes can mean good news *or* fear — ambiguous without news/price context
+- Keyword choice dominates results; random finance keywords often add no edge ([arXiv:1307.4643](https://arxiv.org/abs/1307.4643) and related)
+- Famous “debt → DJIA” style results often **collapse once look-ahead bias is removed** (“Big Data, Small Pickings,” *Journal of Index Investing*)
+- Data are **relative** (0–100), revised, noisy (~rounding/error), and biased toward Google users
+- Search spikes can mean good news *or* fear — ambiguous without news/price context ([arXiv:1403.1715](https://ar5iv.labs.arxiv.org/html/1403.1715))
+- Investor-attention papers (e.g. Da–Engelberg–Gao “In Search of Attention”) support Trends as an *attention* proxy — not a standalone alpha factory
 - Look-ahead / normalization issues break naive backtests
 
 ### Agent rules for Trends

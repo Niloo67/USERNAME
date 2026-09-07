@@ -18,9 +18,12 @@ Curated for **long-term, evidence-based** investing with enough market literacy 
 | Who | Where | Why |
 |-----|--------|-----|
 | **Rational Reminder** (Felix / Passmore / Bortolotti) | Podcast + YouTube | Deep interviews with academics (e.g. lifecycle portfolio choice). |
+| **Rob Berger** | YouTube + blog | Calm DIY analysis; frequently recommended on Bogleheads threads. |
 | **Bogleheads** community | bogleheads.org | Forum + wiki on index investing, costs, asset location. |
-| **Paul Merriman** | paulmerriman.com | Long-horizon portfolio education; points to trustworthy voices. |
+| **Paul Merriman** | paulmerriman.com / Sound Investing podcast | Long-horizon portfolio education; points to trustworthy voices. |
 | **The Money Guy Show** | YouTube/podcast | Practical wealth-building for earners in their 30s (FOO framework) — planning, not stock picking. |
+| **Larry Swedroe** | Books + interviews (Merriman, etc.) | Evidence-based factor literacy; distrusts TV “experts.” |
+| **Rick Ferri** | Books / Bogleheads content | Asset allocation, low-cost indexing discipline. |
 | **Two Cents (PBS)** | YouTube | Personal-finance literacy, calm tone. |
 
 ## Tier B — Market context (use carefully)
@@ -52,4 +55,7 @@ Curated for **long-term, evidence-based** investing with enough market literacy 
 3. The Plain Bagel
 4. Aswath Damodaran (lectures + data page)
 5. Patrick Boyle
-6. Bogleheads wiki bookmark
+6. Rob Berger
+7. Bogleheads wiki bookmark
+
+See also: [`06-curriculum-30-days.md`](06-curriculum-30-days.md) for a week-by-week plan.

@@ -47,7 +47,8 @@ SETUP.md                 ← human activation checklist
 ### Phase 1 — Foundation (now)
 
 - [x] Skill + automation prompt
-- [x] Knowledge base (sources, people, signals, architecture)
+- [x] Knowledge base (sources, people, signals, architecture, curriculum)
+- [x] Executive research brief + 30-day learning plan
 - [ ] Connect Trends + Resend + FinancialMCP keys
 - [ ] Activate Wed/Fri automation; one successful test email
 
