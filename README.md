@@ -19,6 +19,7 @@ Uses Google Trends / multi-source trends, X (Twitter) mention sentiment, market 
 | Path | Purpose |
 |------|---------|
 | `HYBRID.md` | Option C delivery plan + timer UTC map |
+| `docs/fix-trends-mcp-cloud.md` | If digests say Trends auth failed — fix Cloud Agent API key |
 | `knowledge-base/` | Research brief, sources, educators, signals, architecture, 30-day curriculum |
 | `.cursor/skills/portfolio-digest/` | Agent skill: scoring, sleeves, email template |
 | `automations/weekly-portfolio-digest.md` | Ready-to-paste Cursor Automation config |

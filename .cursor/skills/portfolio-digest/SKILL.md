@@ -30,10 +30,12 @@ If paths differ (no-repo automation), apply the same hierarchy from memory: **al
 ## Data gathering order
 
 1. **Market regime** — broad indexes (SPY/VTI, QQQ, IWM), VIX if available, sector ETF performance (XLK, XLF, XLE, XLI, XLV, XLB, XLU), yields/bonds (BND or TLT/SHY)
-2. **Google Trends / search interest** — stock names, sector keywords, tickers via Trends MCP or web research (daily + weekly moves, rising queries)
-3. **X / social mentions** — sentiment, volume spikes, narrative themes via Grok/X MCP or Trends MCP X feed; discount pure meme pumps
+2. **Google Trends / search interest** — Always call Trends MCP (`get_growth` / `get_top_trends`) when the `trends-mcp` tool namespace is available. Prefer WoW/7D and 1M growth for watchlist keywords + live Google Trends / X boards.
+3. **X / social mentions** — Prefer Trends MCP `X (Twitter) Trending` board; add Grok/X MCP if present. Discount pure meme pumps.
 4. **Fundamentals / price context** — price vs 52w range, recent earnings/news, valuation sanity (PE vs peers when available), analyst or earnings catalysts
 5. **Cross-check** — only promote ideas where **trend/social attention + fundamentals + risk fit** align; flag conflicts explicitly
+
+If Trends MCP is listed but returns auth/quota errors (e.g. `Invalid API key`), say **auth/quota failed** — never “not connected.” Do not invent Trends scores.
 
 ## Scoring rubric (0–5 each)
 
