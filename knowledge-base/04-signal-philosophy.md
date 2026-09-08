@@ -5,7 +5,7 @@ How to combine Google Trends, X mentions, and market data **without** pretending
 ## The hierarchy
 
 ```text
-1. Risk capacity & target allocation   (age 30s → equity-heavy but diversified)
+1. Risk capacity & target allocation   (long horizon → equity-heavy but diversified)
 2. Market regime                       (rates, VIX, breadth, oil, USD)
 3. Fundamentals / valuations           (earnings, balance sheet, filings)
 4. Price context                       (52w range, relative strength)
@@ -58,7 +58,7 @@ Each idea scored 0–5 on:
 1. Trend momentum (sustained, not spike)
 2. Social quality (informed vs meme)
 3. Fundamental setup
-4. Risk fit for 30s balanced sleeve
+4. Risk fit for balanced-growth sleeve
 5. Crowding risk (invert euphoria)
 
 **Promote only when** fundamentals + risk fit are solid; Trends/X may boost priority or warn of crowding.
@@ -73,7 +73,7 @@ Each idea scored 0–5 on:
 | Trends ↑ on “bankruptcy” + price crash | Fear attention | Not a buy signal |
 | Oil shock narrative + XLE already +15% in 1m | Story priced in | Wait / small size |
 
-## Portfolio implication for your 30s
+## Portfolio implication for this profile
 
 - **~70–85% equities** in boring broad ETFs (VTI, VXUS, quality tilt)
 - **~15–30% ballast** (short/intermediate bonds; optional small gold)

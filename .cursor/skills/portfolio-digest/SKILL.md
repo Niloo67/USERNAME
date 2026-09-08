@@ -1,11 +1,11 @@
 ---
 name: portfolio-digest
-description: Produce midweek and end-of-week balanced portfolio digests using Google Trends, X/Twitter mentions, market data, and logical risk scoring for an investor in their 30s. Use when generating investment research emails, watchlist updates, or scheduled portfolio summaries.
+description: Produce midweek and end-of-week balanced portfolio digests using Google Trends, X/Twitter mentions, market data, and logical risk scoring for a balanced-growth investor. Use when generating investment research emails, watchlist updates, or scheduled portfolio summaries.
 ---
 
 # Portfolio Digest Skill
 
-Research what looks attractive to buy or hold for a **growth-balanced** investor in their 30s (moderate risk: enough equity growth to compound, not meme-stock / options speculation). Deliver a clear email-ready summary.
+Research what looks attractive to buy or hold for a **growth-balanced** investor (moderate risk: enough equity growth to compound, not meme-stock / options speculation). Deliver a clear email-ready summary.
 
 ## Knowledge base (load first)
 
@@ -21,7 +21,7 @@ If paths differ (no-repo automation), apply the same hierarchy from memory: **al
 
 ## Investor profile (default)
 
-- Age band: 30s; horizon 10–30 years
+- Horizon: long-term (decade+ compounding)
 - Risk: balanced-growth — roughly **70–85% equities / 15–30% ballast** (bonds, cash-like, gold)
 - Prefer liquid ETFs + quality large/mid-caps; avoid leverage, penny stocks, and pure hype
 - Single-name satellite sleeve capped at ~20–25% of equities
@@ -42,7 +42,7 @@ If paths differ (no-repo automation), apply the same hierarchy from memory: **al
 | Trend momentum | Sustained Google/search interest rising WoW, not a 1-day spike |
 | Social quality | Mentions rising with informed discussion, not only meme/hype |
 | Fundamental setup | Reasonable growth/earnings path or clear catalyst |
-| Risk fit | Fits 30s balanced sleeve (liquidity, size, diversification) |
+| Risk fit | Fits balanced-growth sleeve (liquidity, size, diversification) |
 | Crowding risk | Not already extremely crowded / euphoric (lower score if FOMO-only) |
 
 **Action buckets**
@@ -105,7 +105,7 @@ Market snapshot
 Trends & mentions (Google / X)
 - ...
 
-Ideas ranked for a 30s balanced-growth mix
+Ideas ranked for a balanced-growth mix
 1) TICKER — Action — Sleeve — Why (2–3 sentences) — Risk
 2) ...
 

@@ -1,6 +1,6 @@
 # Portfolio Digest Automation
 
-Research stack + Cursor Automation setup for **midweek and end-of-week** investment digests aimed at a **balanced-growth portfolio in your 30s**.
+Research stack + Cursor Automation setup for **midweek and end-of-week** investment digests aimed at a **balanced-growth portfolio**.
 
 Uses Google Trends / multi-source trends, X (Twitter) mention sentiment, market data, and a simple scoring rubric — then emails you a short actionable summary.
 
@@ -42,7 +42,7 @@ Details: `.cursor/skills/portfolio-digest/references/mcp-stack.md`
 
 ## Target risk profile
 
-Default sleeve mix for early/mid 30s (adjust in Memories):
+Default sleeve mix for this balanced-growth profile (adjust in Memories):
 
 - ~45% US total market (VTI)
 - ~20% international (VXUS)

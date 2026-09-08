@@ -4,7 +4,7 @@ What works when people build automated stock research / digest systems (2024–2
 
 ## Pattern A — Scheduled research agent + email (best fit for you)
 
-**Winner for a busy person in their 30s.**
+**Winner for a busy DIY investor.**
 
 | Piece | Choice |
 |-------|--------|
@@ -46,7 +46,7 @@ Seen in weekend builds with n8n multi-agent steps, CrewAI/LangGraph, FinSight-st
 Kafka + sentiment scoring + Grafana (e.g. stock-sentiment-platform).
 
 **Pros:** production-grade monitoring.  
-**Cons:** overkill for twice-weekly digests. Skip unless you later want day-trading alerts (you don’t, for a 30s balanced portfolio).
+**Cons:** overkill for twice-weekly digests. Skip unless you later want day-trading alerts (you don’t, for this balanced-growth profile).
 
 ## Cursor vs n8n (decision table)
 

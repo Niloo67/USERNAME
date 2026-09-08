@@ -3,7 +3,7 @@
 Copy used by Cloud Agent `subscribe_timer` follow-ups.
 
 ```text
-Run the portfolio-digest skill for Niloo (balanced-growth, 30s).
+Run the portfolio-digest skill for Niloo (balanced-growth).
 
 1. Read knowledge-base/ (esp. 04-signal-philosophy, 05-architecture) and HYBRID.md.
 2. Fetch live market data (Yahoo chart API or available MCPs): SPY/VTI, QQQ, IWM, VXUS/EFA, sector ETFs, BND/SHY, GLD, VIX, 10Y (^TNX), oil if relevant; plus watchlist names as needed.

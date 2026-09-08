@@ -22,7 +22,7 @@ Not financial advice. Prices from Yahoo Finance chart API (query2). Macro from A
 | AI power / nuclear must-buy now | URA −30% 3m; CCJ −28% 3m; CEG/VST weak vs highs | **Conflict** — thesis may be right long-term, tape says wait/verify |
 | Industrials = easy AI infra trade | XLI flat/soft 1m; CAT −18% 1m; GE still strong +26% 3m | **Mixed** — stock-pick / ETF small size only |
 
-## Ideas worth verifying (ranked for a 30s balanced mix)
+## Ideas worth verifying (ranked for a balanced-growth mix)
 
 ### A) High conviction process (buy/hold core) — logistics first
 

@@ -44,7 +44,7 @@ Prioritize **primary** sources, then reputable aggregators. Use social/trends la
 | Source | Why |
 |--------|-----|
 | **Bogleheads wiki / forum** | Evidence-based allocation, costs, behavior |
-| **Bogleheads start-up kit** | Best first read for a 30s DIY investor |
+| **Bogleheads start-up kit** | Best first read for a DIY investor starting out |
 | **Aswath Damodaran data** (NYU Stern) | Equity risk premiums, industry betas, valuation datasets |
 | **SSRNs / academic papers** | When checking a “strategy” claim (e.g. Trends predictability) |
 | **Broker research** (Vanguard, Fidelity, Schwab) | Asset allocation frameworks |

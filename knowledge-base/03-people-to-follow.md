@@ -8,7 +8,7 @@ Curated for **long-term, evidence-based** investing with enough market literacy 
 
 | Who | Where | Why follow |
 |-----|--------|------------|
-| **Ben Felix** | YouTube + [Rational Reminder](https://rationalreminder.ca) podcast | Evidence-based allocation, behavior, academic citations. Best “operating system” for a 30s investor. |
+| **Ben Felix** | YouTube + [Rational Reminder](https://rationalreminder.ca) podcast | Evidence-based allocation, behavior, academic citations. Best “operating system” for a long-horizon DIY investor. |
 | **The Plain Bagel** (Richard Coffin) | YouTube | Clear, CFA-grounded explainers; myth-busting; excellent foundation. |
 | **Aswath Damodaran** | [YouTube](https://www.youtube.com/c/AswathDamodaranonValuation) + [stern.nyu.edu/~adamodar](https://pages.stern.nyu.edu/~adamodar/) | Dean of valuation. Free MBA-level valuation + public data sets. Use when sizing single-stock satellites. |
 | **Patrick Boyle** | YouTube | Institutional skepticism; deconstructs hype, products, and market narratives. |
@@ -21,7 +21,7 @@ Curated for **long-term, evidence-based** investing with enough market literacy 
 | **Rob Berger** | YouTube + blog | Calm DIY analysis; frequently recommended on Bogleheads threads. |
 | **Bogleheads** community | bogleheads.org | Forum + wiki on index investing, costs, asset location. |
 | **Paul Merriman** | paulmerriman.com / Sound Investing podcast | Long-horizon portfolio education; points to trustworthy voices. |
-| **The Money Guy Show** | YouTube/podcast | Practical wealth-building for earners in their 30s (FOO framework) — planning, not stock picking. |
+| **The Money Guy Show** | YouTube/podcast | Practical wealth-building for working earners (FOO framework) — planning, not stock picking. |
 | **Larry Swedroe** | Books + interviews (Merriman, etc.) | Evidence-based factor literacy; distrusts TV “experts.” |
 | **Rick Ferri** | Books / Bogleheads content | Asset allocation, low-cost indexing discipline. |
 | **Two Cents (PBS)** | YouTube | Personal-finance literacy, calm tone. |

@@ -32,7 +32,7 @@ A practical plan to build real investing literacy while the digest agent runs. ~
 
 **Outcome:** you know why Trends/X ≠ a buy signal.
 
-## Week 4 — Your life stage (30s)
+## Week 4 — Building wealth while working
 
 | Do | Link |
 |----|------|

@@ -5,7 +5,7 @@ A durable knowledge base for building **midweek + end-of-week** investment diges
 - Google Trends / search interest
 - X (Twitter) mentions & sentiment
 - Market prices + fundamentals
-- Logical risk scoring for a **balanced-growth portfolio in your 30s**
+- Logical risk scoring for a **balanced-growth portfolio**
 
 This is **research infrastructure**, not personalized financial advice.
 

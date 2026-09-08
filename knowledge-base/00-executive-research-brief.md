@@ -1,6 +1,6 @@
 # Executive research brief — how to build this the right way
 
-Research summary for Niloo (Sep 2026). Goal: midweek + end-of-week digests using Google Trends, X mentions, market data, and logic — for a **balanced-growth portfolio in your 30s** — plus a durable knowledge base.
+Research summary for Niloo (Sep 2026). Goal: midweek + end-of-week digests using Google Trends, X mentions, market data, and logic — for a **balanced-growth portfolio** — plus a durable knowledge base.
 
 > Not financial advice. Infrastructure and education research only.
 
@@ -13,7 +13,7 @@ Research summary for Niloo (Sep 2026). Goal: midweek + end-of-week digests using
 | **1** | **Cursor Automations + MCPs + Resend + Memories + this knowledge base** | Lowest ops for you; already in Cursor; HTTP MCPs work in cloud; Memories improve week-over-week; skill/KB keep the agent honest |
 | **2** | **n8n / Make cron + Alpha Vantage/EODHD + AI summarize + Gmail/Resend** | Very common “weekend build”; deterministic fetch → AI narrative; great if you want a visual workflow UI |
 | **3** | Multi-agent pipeline (CrewAI / LangGraph / critic agent) | Higher quality later; add after Pattern A runs 4–8 weeks |
-| **Skip (for now)** | Kafka streaming / day-trade X firehose / auto-trading bots | Wrong risk profile for a 30s balanced investor |
+| **Skip (for now)** | Kafka streaming / day-trade X firehose / auto-trading bots | Wrong risk profile for a balanced-growth investor |
 
 ### Why Pattern A wins specifically for you
 
@@ -62,7 +62,7 @@ Full tier list: [`02-data-sources.md`](02-data-sources.md).
 
 | Who | Platform | What you learn |
 |-----|----------|----------------|
-| **Ben Felix** | YouTube + Rational Reminder podcast | Evidence-based portfolios, behavior, academic citations — best OS for a 30s investor |
+| **Ben Felix** | YouTube + Rational Reminder podcast | Evidence-based portfolios, behavior, academic citations — best OS for a long-horizon DIY investor |
 | **The Plain Bagel** (Richard Coffin) | YouTube | Clear CFA-grounded foundations / myth-busting |
 | **Aswath Damodaran** | YouTube + NYU data page | How to value a company if you ever buy a stock satellite |
 | **Patrick Boyle** | YouTube | Institutional skepticism; kills hype narratives |
@@ -73,7 +73,7 @@ Full tier list: [`02-data-sources.md`](02-data-sources.md).
 | Who | Why |
 |-----|-----|
 | **Paul Merriman** / Sound Investing | Long-horizon education; factor & glide-path literacy |
-| **The Money Guy Show** | FOO framework — earn/save/invest system for people in their 30s |
+| **The Money Guy Show** | FOO framework — earn/save/invest system for working earners |
 | **Larry Swedroe / Rick Ferri** (books + interviews) | Factor investing, evidence discipline |
 | **Bogleheads forum** | Community sanity check |
 
