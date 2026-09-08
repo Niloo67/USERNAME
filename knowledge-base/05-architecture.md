@@ -49,8 +49,10 @@ SETUP.md                 ← human activation checklist
 - [x] Skill + automation prompt
 - [x] Knowledge base (sources, people, signals, architecture, curriculum)
 - [x] Executive research brief + 30-day learning plan
-- [ ] Connect Trends + Resend + FinancialMCP keys
-- [ ] Activate Wed/Fri automation; one successful test email
+- [x] **Hybrid Option C:** Wed/Fri digests via this Cloud Agent + `digests/` (see `HYBRID.md`)
+- [ ] Connect Trends + Resend + FinancialMCP keys (optional until email phase)
+- [ ] Activate Cursor Automations email (deferred — Agents Window)
+- [ ] Phase 2: GitHub Pages dashboard (~1 month)
 
 ### Phase 2 — Quality loop (after 4+ digests)
 

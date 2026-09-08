@@ -8,15 +8,17 @@ Uses Google Trends / multi-source trends, X (Twitter) mention sentiment, market 
 
 ## Start here
 
-1. **[`knowledge-base/00-executive-research-brief.md`](knowledge-base/00-executive-research-brief.md)** — best setup, websites, who to follow  
-2. **[`knowledge-base/`](knowledge-base/README.md)** — full doctrine + 30-day curriculum  
-3. **[`SETUP.md`](SETUP.md)** — activate Wed/Fri emails (API keys + `/automate`)  
-4. **`.cursor/skills/portfolio-digest/`** — what the agent does each run  
+1. **[`HYBRID.md`](HYBRID.md)** — **active delivery** (Wed/Fri digests in chat + repo; dashboard later)  
+2. **[`knowledge-base/00-executive-research-brief.md`](knowledge-base/00-executive-research-brief.md)** — best setup, websites, who to follow  
+3. **[`knowledge-base/`](knowledge-base/README.md)** — full doctrine + 30-day curriculum  
+4. **[`SETUP.md`](SETUP.md)** — optional later: Automations + email keys  
+5. **`.cursor/skills/portfolio-digest/`** — what the agent does each run  
 
 ## What’s in this repo
 
 | Path | Purpose |
 |------|---------|
+| `HYBRID.md` | Option C delivery plan + timer UTC map |
 | `knowledge-base/` | Research brief, sources, educators, signals, architecture, 30-day curriculum |
 | `.cursor/skills/portfolio-digest/` | Agent skill: scoring, sleeves, email template |
 | `automations/weekly-portfolio-digest.md` | Ready-to-paste Cursor Automation config |

@@ -1,8 +1,12 @@
-# Activate your Wed + Fri portfolio emails
+# Activate email later (optional)
 
-**Before this:** skim [`knowledge-base/README.md`](knowledge-base/README.md) so the system’s sources and rules are clear.
+**Active now:** see [`HYBRID.md`](HYBRID.md) — Wed/Fri digests in this Cloud Agent chat + `digests/` folder (no email required).
 
-Do these steps in order. About 10 minutes. You need a **paid Cursor plan** (Cloud Agents / Automations).
+Use this file when you are ready for **Cursor Automations + Resend email** (Phase 3).
+
+**Before email setup:** skim [`knowledge-base/README.md`](knowledge-base/README.md).
+
+About 10 minutes. You need a **paid Cursor plan** (Cloud Agents / Automations) and the **Agents Window** for `/automate`.
 
 ## 1) Get free API keys
 
