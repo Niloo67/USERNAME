@@ -91,35 +91,47 @@ Fuller wrap:
 4. Watchlist for next week
 5. Memory update: what to track next run
 
-## Output format (email body)
+## Output format (keep it easy to read)
+
+Write for a busy human. Short sentences. Few tables. No jargon unless you explain it in plain words.
 
 ```text
-Subject: [Midweek|Weekend] Portfolio Digest — YYYY-MM-DD
+# Midweek check-in — Mon DD, YYYY
+(or: Weekend wrap — Mon DD, YYYY)
 
-Hi Niloo —
+Not financial advice.
 
-TL;DR
-- ...
+## In one sentence
+...
 
-Market snapshot
-- ...
+## What to do this week
+| Do this | Ticker | Why (simple) |
+|---------|--------|--------------|
+| Keep / Add / Wait | VTI | ... |
 
-Trends & mentions (Google / X)
-- ...
+Max 5 action rows.
 
-Ideas ranked for a balanced-growth mix
-1) TICKER — Action — Sleeve — Why (2–3 sentences) — Risk
-2) ...
+## What to leave alone (for now)
+| Skip | Why |
+|------|-----|
+| ... | ... |
 
-Suggested allocation nudges
-- ...
+Max 4 skip rows.
 
-What NOT to chase
-- ...
+## What’s going on (context)
+3–5 short bullets. Markets / oil / rates / Fed. One bullet on Trends+X (what rose, or “auth failed”).
 
-Sources & caveats
-- Not financial advice. Data as of <timestamp>. Trends ≠ guaranteed returns.
+## Simple target mix (reminder)
+4 bullets max. Say these are nudges, not a full rebalance.
+
+## Look at next
+2–4 bullets.
+
+Prices as of <timestamp + source>.
 ```
+
+Avoid: dense multi-column price dumps, 52w percentiles, long “regime read” paragraphs, ticker soup without actions.
+Midweek = shorter. Weekend = same shape + “what worked / what didn’t” this week.
 
 ## Delivery
 

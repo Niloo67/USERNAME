@@ -39,4 +39,12 @@ If DST shifts (EST = UTC−5), update crons by +1 hour UTC.
 ## Digest rules
 
 Follow `.cursor/skills/portfolio-digest/SKILL.md` + `knowledge-base/`.
-Not financial advice. Max 7 ideas. Always include “what NOT to chase.”
+Not financial advice. Keep digests **plain English**: one-sentence summary, small “do this / skip this” tables, no dense price dumps.
+
+## Latest digest
+
+→ [`digests/2026-09-09-midweek.md`](digests/2026-09-09-midweek.md)
+
+## Trends key for this Cloud Agent
+
+Desktop “connected” is not enough. Follow [`docs/fix-trends-mcp-cloud.md`](docs/fix-trends-mcp-cloud.md), then reply: `Trends key fixed — regenerate digest`.

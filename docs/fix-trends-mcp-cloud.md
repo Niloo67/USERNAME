@@ -1,22 +1,47 @@
-# Fix Trends MCP for Cloud Agent digests
+# How to give this Cloud Agent a working Trends key
 
-Desktop Cursor can show Trends MCP as connected while **this Cloud Agent** still fails with `Invalid API key`. Digests must use the key attached to the **cloud / dashboard** MCP config.
+Your desktop Cursor can show Trends as “connected” while **this Cloud Agent still has a bad key**. That is why digests said Trends failed.
 
-## Quick check
+You only need to do this once.
 
-From an agent that should use Trends, a call like “get Google Trends top US” should return rows — not `Invalid API key`.
+## Step A — Get your Trends key (2 minutes)
 
-## Fix
+1. Open [https://trendsmcp.ai](https://trendsmcp.ai) in your browser.
+2. Enter your email (`niloo.shayan@gmail.com`) and get a free API key emailed to you.
+3. Open the email and **copy the key** (a long string). Keep it handy.
 
-1. Open [cursor.com](https://cursor.com) → **Dashboard → Cloud Agents / Integrations & MCP** (or the MCP panel used by Cloud Agents).
-2. Find **trends-mcp** (URL should be `https://api.trendsmcp.ai/mcp`).
-3. Set header: `Authorization: Bearer <your real Trends key>`  
-   Get/rotate the key at [trendsmcp.ai](https://trendsmcp.ai) (check the email that received the key).
-4. Save, then **restart / re-open this Cloud Agent** (or start a new follow-up) so it picks up the new key.
-5. Reply here: **“Trends key fixed — regenerate digest”** and I’ll rerun the attention layer on the latest digest.
+If you already have a key and aren’t sure it’s right, request/rotate a new one on the Trends site and use the new one.
 
-## Notes
+## Step B — Add it for Cloud Agents (not desktop)
 
-- Local `~/.cursor/mcp.json` does **not** automatically fix Cloud Agent MCP auth.
-- Free Trends tier is limited (~100 req/mo) — digests should call a small fixed set of tools each run.
-- Skill/timers now say **auth/quota failed** instead of “not connected” when this happens.
+Desktop Settings → MCP does **not** fix Cloud Agents. Do this on the website:
+
+1. Open [https://cursor.com/agents](https://cursor.com/agents) while logged in.
+2. Click the **`+`** button near the chat box (left of the prompt / near the model picker).
+3. Hover **MCP Servers** → click **Add MCP** (or **Add**).
+4. Choose **HTTP** (not SSE).
+5. Fill in:
+   - **URL:** `https://api.trendsmcp.ai/mcp`
+   - **Header name:** `Authorization`
+   - **Header value:** `Bearer ` + your key  
+     Example shape only: `Bearer abc123...`  
+     (the word `Bearer`, a space, then the key — no quotes)
+6. Save / enable it.
+
+Optional team path: [https://cursor.com/dashboard/integrations](https://cursor.com/dashboard/integrations) → Team MCP Servers → same URL + header.
+
+## Step C — Tell me it’s done
+
+Reply here with exactly:
+
+`Trends key fixed — regenerate digest`
+
+I will call Trends again and rewrite the digest with Google Trends + X included.
+
+## If it still fails
+
+- Make sure the header value starts with `Bearer ` (with a space).
+- Paste a **fresh** key (old keys / typos cause `Invalid API key`).
+- Start a new message in this agent after saving (so it reloads tools).
+
+You do **not** need to paste the key into this chat.
