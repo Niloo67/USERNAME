@@ -49,7 +49,7 @@ Core only. This is a retirement account — fix concentration with indexes.
 
 **Nervous about the USA?** Vanguard ETFs are still fine vehicles — see `digests/2026-10-08-vanguard-us-risk.md`. Softer split: **VCN $900 · XEF (or VXC) $700 · VFV $400**. Don’t add more CRWD/NVDA from fear of “missing” the US.
 
-**Want “what goes up next” more than balance?** Rank *all* world themes first: `digests/2026-10-08-world-themes-ranked.md` — RRSP lean: **ITA $800 · COPX $900 · TECK/ETN $300**. **Do not** add CRWD or more CCJ (already owned).
+**Want “what goes up next” more than balance?** See `digests/2026-10-08-three-buy-sets.md` — RRSP lean: **COPX $1,000 · TECK-B.TO $500 · ETN $500** (no defense; no more CRWD/CCJ).
 
 ### Do **not** buy with this cash
 - **CRWD, NVDA, GOOGL/GOOG.TO, CMPS, CCJ, URA, CEG, SMH, COPX, more banks, more oil**
