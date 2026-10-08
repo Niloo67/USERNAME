@@ -1,6 +1,9 @@
 # TFSA balance review + $2,000 cash plan — Oct 8, 2026
 
-Not financial advice. Personalized read of your TFSA screenshots + ~$2,000 CAD cash. Trends: auth/quota failed.
+**Personalized for Niloo only.** Holdings source: `portfolio/niloo-tfsa-holdings.md`.  
+Generic “what to buy” for any reader: `digests/2026-10-08-buy-now.md` (do not mix).
+
+Not financial advice. Personalized read of TFSA screenshots + ~$2,000 CAD cash. Trends: auth/quota failed.
 
 ## In one sentence
 **Not well balanced yet** — you own good companies, but too much sits in a few names (CNR, RY, AI hardware) and too little in plain index ETFs; spend most of the $2,000 fixing that, not chasing new themes.

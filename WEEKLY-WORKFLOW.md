@@ -16,6 +16,8 @@ Niloo’s recurring system: an agent researches the world + markets, scores idea
 
 Files land in `digests/` and in this Cloud Agent chat. Later: email (Phase 3) + dashboard (Phase 2).
 
+**Generic vs personal:** weekly digests are for a generic balanced-growth reader. Niloo’s TFSA holdings live in `portfolio/` and must stay out of Sun/Wed/Fri reports unless she asks for a personalized review (`digests/*-tfsa-*.md`).
+
 ---
 
 ## Agentic loop (every run)

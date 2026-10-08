@@ -29,6 +29,7 @@ If paths differ (no-repo automation), apply the same hierarchy from memory: **al
 - Prefer liquid ETFs + quality large/mid-caps; avoid leverage, penny stocks, and pure hype
 - Single-name satellite sleeve capped at ~20–25% of equities
 - Not personalized financial advice; label ideas as research hypotheses
+- Default digests are **generic**. Only load `portfolio/` (e.g. Niloo TFSA holdings) when she asks about her account; write personalized notes as `digests/*-tfsa-*.md`, never rewrite the generic buy report into a personal one
 
 ## Data gathering order
 
