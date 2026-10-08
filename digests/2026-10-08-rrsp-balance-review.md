@@ -47,6 +47,8 @@ Core only. This is a retirement account — fix concentration with indexes.
 | 3 | **VEQT.TO** *or* more **VXC.TO** | 300 | Grow the simple all-equity / global sleeve (VEQT is only 1 share today) |
 | — | Keep a little cash | 0–100 | Optional |
 
+**Nervous about the USA?** Vanguard ETFs are still fine vehicles — see `digests/2026-10-08-vanguard-us-risk.md`. Softer split: **VCN $900 · XEF (or VXC) $700 · VFV $400**. Don’t add more CRWD/NVDA from fear of “missing” the US.
+
 ### Do **not** buy with this cash
 - **CRWD, NVDA, GOOGL/GOOG.TO, CMPS, CCJ, URA, CEG, SMH, COPX, more banks, more oil**
 - Any more microcaps (GMA / GRN / WELL)

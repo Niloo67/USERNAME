@@ -50,6 +50,8 @@ Fund **balance first**, themes last.
 | 4 | **COPX** *or* small **CCJ** | 200 | One theme only — prefer COPX unless you specifically want more uranium |
 | 5 | Keep as cash buffer | 100 | Optional dry powder |
 
+**Nervous about the USA?** Vanguard itself is fine — see `digests/2026-10-08-vanguard-us-risk.md`. Softer split: **VCN $900 · XEF $700 · VFV $400** (skip themes this wad).
+
 If you hate USD conversion: use **MSFT.TO** CDR instead of MSFT, and skip COPX/CCJ (USD) — put that $200 into more VFV or VCN instead.
 
 ### Do **not** buy with this cash
