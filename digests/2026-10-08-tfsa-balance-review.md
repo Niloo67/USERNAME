@@ -52,7 +52,7 @@ Fund **balance first**, themes last.
 
 **Nervous about the USA?** Vanguard itself is fine — see `digests/2026-10-08-vanguard-us-risk.md`. Softer split: **VCN $900 · XEF $700 · VFV $400** (skip themes this wad).
 
-**Want “what goes up next” (AI power) more than balance?** See `digests/2026-10-08-ai-power-prediction-sleeve.md` — TFSA lean: **CCJ $500 · COPX $800 · ETN/PWR $400** (+ optional cash). Keep this as a sleeve, not the whole account.
+**Want “what goes up next” more than balance?** Rank *all* world themes first: `digests/2026-10-08-world-themes-ranked.md` — TFSA lean: **ITA $700 · COPX $700 · CCJ $600**. (AI power alone is optional: `*-ai-power-prediction-sleeve.md`.)
 
 If you hate USD conversion: use **MSFT.TO** CDR instead of MSFT, and skip COPX/CCJ (USD) — put that $200 into more VFV or VCN instead.
 

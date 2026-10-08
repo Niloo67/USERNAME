@@ -1,7 +1,8 @@
 # Smart buys for “what goes up next” — AI power sleeve — Oct 8, 2026
 
-Not financial advice. For when you want **circumstances → bottleneck → ticker**, not only a balanced mix.  
-Trends: auth/quota failed. Generic theme note (any reader). Account-specific cash notes at the bottom.
+Not financial advice. **This is only the AI-power row** of the world-themes table (example deep dive).  
+For the full menu ranked against oil / chips / copper / defense / gold, see **`digests/2026-10-08-world-themes-ranked.md`** first.  
+Trends: auth/quota failed. Account-specific cash notes at the bottom.
 
 ## In one sentence
 Nobody can promise “goes up quickly,” but the cleanest **near-term AI circumstance** is still **power + grid + copper** — chips are real but already crowded in your accounts; buy the bottleneck that isn’t fully priced in your portfolio.
