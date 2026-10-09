@@ -91,7 +91,8 @@ Must include:
 ## Investor preferences (Memories)
 
 - Wants **explanations**, not only short tables  
-- Open to world themes (oil, AI hardware, AI power, copper, defense)  
+- Open to world themes (oil, AI hardware, AI power, copper, grid) — **no military/defense** (skip ITA, XAR, etc.)  
 - Interested in psychedelics (CMPS) as tiny curiosity — not core  
 - Canada-based; prefer CAD-listed core where useful  
+- Personalized TFSA/RRSP snapshots in `portfolio/` — do not mix into generic Friday unless she asks  
 - Email later via Resend; for now chat + `digests/`
