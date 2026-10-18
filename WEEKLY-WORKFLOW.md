@@ -10,11 +10,12 @@ Niloo’s recurring system: an agent researches the world + markets, scores idea
 
 | When (ET) | Agent run | You get | Your job (~10–20 min) |
 |-----------|-----------|---------|------------------------|
+| **Mon–Fri ~9:30** | Must-buy alert | Chat ping only if something is a true must-buy (else “none today”) | Act only when alerted |
 | **Sunday ~18:00** | Week-ahead brief | Themes + calendar + “watch these” | Skim; note questions in chat |
 | **Wednesday ~10:00** | Midweek pulse | Short do / skip tables | Nudge contributions if soft |
 | **Friday ~16:05** | Full decision report | Explained shopping list + what worked | Place or skip buys for next week |
 
-Files land in `digests/` and in this Cloud Agent chat. Later: email (Phase 3) + dashboard (Phase 2).
+Files land in `digests/` and in this Cloud Agent chat. Must-buy rules: `automations/must-buy-alert.md`. Later: email (Phase 3) + dashboard (Phase 2).
 
 **Generic vs personal:** weekly digests are for a generic balanced-growth reader. Niloo’s account snapshots live in `portfolio/` (`niloo-tfsa-holdings.md`, `niloo-rrsp-holdings.md`) and must stay out of Sun/Wed/Fri reports unless she asks for a personalized review (`digests/*-tfsa-*.md`, `digests/*-rrsp-*.md`).
 

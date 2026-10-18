@@ -95,4 +95,5 @@ Must include:
 - Interested in psychedelics (CMPS) as tiny curiosity — not core  
 - Canada-based; prefer CAD-listed core where useful  
 - Personalized TFSA/RRSP snapshots in `portfolio/` — do not mix into generic Friday unless she asks  
+- **Must-buy alerts:** weekday 9:30am ET via `portfolio-must-buy` timer — see `automations/must-buy-alert.md`  
 - Email later via Resend; for now chat + `digests/`

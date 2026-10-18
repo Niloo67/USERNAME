@@ -8,13 +8,14 @@ Chosen path while Cursor Automations email is deferred.
 
 | Cadence (ET) | Agent run | Output |
 |--------------|-----------|--------|
+| **Mon–Fri ~9:30** | **Must-buy alert** | Cursor chat ping (file only if real must-buy) |
 | **Sunday ~18:00** | Week-ahead brief | chat + `digests/YYYY-MM-DD-week-ahead.md` |
 | **Wednesday ~10:00** | Midweek pulse | chat + `digests/YYYY-MM-DD-midweek.md` |
 | **Friday ~16:05** | Full decision report | chat + `digests/YYYY-MM-DD-eow.md` |
 
 Implementation: `cursor-subscriptions` timers on this agent run (`subscribe_timer`).  
 Prompts: [`automations/hybrid-timer-prompt.md`](automations/hybrid-timer-prompt.md)  
-Pipeline: [`automations/weekly-decision-agent.md`](automations/weekly-decision-agent.md)
+Pipeline: [`automations/weekly-decision-agent.md`](automations/weekly-decision-agent.md) · alerts: [`automations/must-buy-alert.md`](automations/must-buy-alert.md)
 
 **You review:** open this agent chat, or browse `digests/` on GitHub.
 
@@ -37,6 +38,7 @@ See [`automations/weekly-portfolio-digest.md`](automations/weekly-portfolio-dige
 
 | Local (ET) | Cron (UTC) | Name |
 |------------|------------|------|
+| Mon–Fri 9:30 | `30 13 * * 1-5` | `portfolio-must-buy` |
 | Sun 18:00 | `0 22 * * 0` | `portfolio-week-ahead` |
 | Wed 10:00 | `0 14 * * 3` | `portfolio-digest-wed` |
 | Fri 16:05 | `5 20 * * 5` | `portfolio-digest-fri` |

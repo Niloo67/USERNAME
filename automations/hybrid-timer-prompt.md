@@ -76,6 +76,27 @@ Follow automations/weekly-decision-agent.md + WEEKLY-WORKFLOW.md + knowledge-bas
 
 ---
 
+## Must-buy alert (weekday mornings)
+
+**Name:** `portfolio-must-buy`  
+**Cron (UTC):** `30 13 * * 1-5` → Mon–Fri **9:30am ET** (EDT)  
+**Rules:** [`must-buy-alert.md`](must-buy-alert.md)
+
+```text
+Run the Must-buy alert agent for Niloo.
+
+Follow automations/must-buy-alert.md + knowledge-base/07-weekly-decision-framework.md + last digest.
+
+1. Sense: Yahoo prices for VFV.TO VCN.TO XEF.TO GOOGL MSFT COPX CCJ ETN + oil/AI context; Trends if available (auth/quota failed if key errors).
+2. Decide strictly: is anything a true MUST BUY today? Prefer "No must-buy today."
+3. If MUST BUY: write digests/YYYY-MM-DD-must-buy.md, commit, push, update PR; paste short alert in chat (max 3 tickers + size tip + bear case one line each).
+4. If none: paste only one short chat line: "No must-buy today. Keep funding VFV/VCN/XEF on schedule." Do not invent urgency.
+5. Refresh Sun/Wed/Fri + must-buy timers if near expiry.
+6. Rules: not financial advice; no defense; no leverage/options/pennies; never invent prices; never mention age.
+```
+
+---
+
 ## DST note
 
 EDT = UTC−4 (crons above). In EST (UTC−5), add +1 hour to each UTC cron minute/hour as needed.
