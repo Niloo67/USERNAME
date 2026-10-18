@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "gitlab": {
+      "url": "https://gitlab.example.com/api/v4/mcp"
+    },
+    "atlassian": {
+      "url": "https://mcp.atlassian.com/v1/sse"
+    }
+  }
+}
