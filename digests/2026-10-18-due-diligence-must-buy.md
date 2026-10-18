@@ -1,7 +1,7 @@
 # Due-diligence report — what is actually worth buying now (Oct 18, 2026)
 
 Not financial advice. No military/defense. No leverage, options, or pennies.  
-Prices: Oct 17 close. Valuation figures from FactSet, company filings, and web aggregators (approximate; sources at the bottom). Trends MCP: **auth/quota failed** — no attention data used.
+Prices: Friday Oct 16 close (last session). Valuation figures from FactSet, company filings, and web aggregators (approximate; sources at the bottom). Trends MCP: **auth/quota failed** — no attention data used.
 
 Part A is **generic** (any Canada-based balanced-growth investor). Part B is **Niloo-specific** and uses `portfolio/niloo-*-holdings.md`. Part A was built first, without reference to Part B.
 
