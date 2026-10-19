@@ -1,0 +1,20 @@
+{
+  "name": "kumon-checkin",
+  "version": "1.0.0",
+  "description": "Scanner-first check-in / check-out for a Kumon learning centre",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "nodemailer": "^10.1.7",
+    "qrcode": "^1.5.4"
+  }
+}

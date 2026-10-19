@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kumon Check-In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand" id="centre-brand">Kumon Check-In<span>Front desk · scanner ready</span></div>
+      <nav class="nav no-print">
+        <a href="/" class="active">Scan</a>
+        <a href="/roster.html">Roster</a>
+        <a href="/logs.html">Logs</a>
+        <a href="/settings.html">Settings</a>
+      </nav>
+    </header>
+
+    <div class="grid-2">
+      <section class="panel">
+        <h2>Scan student</h2>
+        <p class="muted">Plug in a USB/Bluetooth 2D QR scanner, or type a student code and press Enter. Camera is optional backup.</p>
+
+        <div class="mode-group" role="group" aria-label="Check-in mode">
+          <button type="button" class="mode-btn active" data-mode="auto">Auto</button>
+          <button type="button" class="mode-btn" data-mode="force_in">Force Check-In</button>
+          <button type="button" class="mode-btn" data-mode="force_out">Force Check-Out</button>
+        </div>
+
+        <label class="label" for="scan-input">Scanner / student code</label>
+        <input id="scan-input" class="scan-box" data-scan-input="1" autocomplete="off" autofocus placeholder="Scan badge or type K-0001" />
+
+        <div class="field suggestions" style="margin-top: 0.85rem;">
+          <label class="label" for="manual-search">Manual search (name or ID)</label>
+          <input id="manual-search" autocomplete="off" placeholder="Start typing a name…" />
+          <div id="suggestions" class="suggestions-list"></div>
+        </div>
+
+        <div class="row" style="margin-top: 0.75rem;">
+          <button type="button" id="camera-toggle" class="secondary">Use camera</button>
+          <button type="button" id="refocus-scan" class="secondary">Focus scan box</button>
+        </div>
+
+        <div id="camera-panel" class="camera-panel">
+          <div id="qr-reader"></div>
+          <p class="muted" style="margin-top: 0.5rem;">Point the rear camera at a QR badge. Works best in good light.</p>
+        </div>
+
+        <div id="feedback" class="feedback" aria-live="polite">
+          Ready to scan
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="row" style="justify-content: space-between; margin-bottom: 0.5rem;">
+          <h2 style="margin: 0;">Who is here</h2>
+          <span class="muted" id="active-count">0 students</span>
+        </div>
+        <ul id="active-list" class="list"></ul>
+        <p id="active-empty" class="muted">No students checked in yet.</p>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="/app.js"></script>
+  <script>
+    (() => {
+      const { api, $, playTone, formatDuration, subjectTags, escapeHtml, attachGlobalScanner, toast } = Kumon;
+
+      let mode = "auto";
+      let busy = false;
+      let cameraOn = false;
+      let html5QrCode = null;
+      let rosterCache = [];
+
+      const scanInput = $("#scan-input");
+      const feedback = $("#feedback");
+      const activeList = $("#active-list");
+      const activeEmpty = $("#active-empty");
+      const activeCount = $("#active-count");
+      const suggestions = $("#suggestions");
+      const manualSearch = $("#manual-search");
+
+      document.querySelectorAll(".mode-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          mode = btn.dataset.mode;
+          scanInput.focus();
+        });
+      });
+
+      $("#refocus-scan").addEventListener("click", () => scanInput.focus());
+
+      function showFeedback(kind, title, detail) {
+        feedback.className = "feedback " + (kind || "");
+        feedback.innerHTML = `<div><strong>${escapeHtml(title)}</strong><div class="muted">${escapeHtml(detail || "")}</div></div>`;
+      }
+
+      async function loadSettingsBrand() {
+        try {
+          const s = await api("/api/settings");
+          const brand = $("#centre-brand");
+          brand.innerHTML = `${escapeHtml(s.centreName)}<span>Front desk · scanner ready</span>`;
+        } catch { /* ignore */ }
+      }
+
+      async function refreshActive() {
+        const data = await api("/api/active");
+        const students = data.students || [];
+        activeCount.textContent = `${students.length} student${students.length === 1 ? "" : "s"}`;
+        activeEmpty.style.display = students.length ? "none" : "block";
+        activeList.innerHTML = students
+          .map(
+            (s) => `
+          <li class="list-item" data-id="${s.id}" data-checked-in-at="${escapeHtml(s.checkedInAt || "")}">
+            <div>
+              <div class="name">${escapeHtml(s.name)}</div>
+              <div class="muted">${escapeHtml(s.studentCode)}</div>
+              <div class="tags">${subjectTags(s.subjects)}</div>
+            </div>
+            <div class="row">
+              <span class="timer">${formatDuration(s.checkedInAt)}</span>
+              <button type="button" class="secondary checkout-btn" data-code="${escapeHtml(s.studentCode)}">Check out</button>
+            </div>
+          </li>`
+          )
+          .join("");
+      }
+
+      function tickTimers() {
+        activeList.querySelectorAll(".list-item").forEach((li) => {
+          const timer = li.querySelector(".timer");
+          if (timer) timer.textContent = formatDuration(li.dataset.checkedInAt);
+        });
+      }
+
+      async function processCode(code, overrideMode) {
+        const cleaned = String(code || "").trim();
+        if (!cleaned || busy) return;
+        busy = true;
+        try {
+          const result = await api("/api/scan", {
+            method: "POST",
+            body: JSON.stringify({ code: cleaned, mode: overrideMode || mode }),
+          });
+          const kind = result.action === "check_in" ? "ok" : "out";
+          playTone(result.action === "check_in" ? "in" : "out");
+          const emailNote =
+            result.email?.status === "sent"
+              ? "Parent email sent"
+              : result.email?.status === "failed"
+                ? `Email failed: ${result.email.detail}`
+                : result.email?.detail || "";
+          const contact = [
+            result.student.parentPhone ? `Phone ${result.student.parentPhone}` : "",
+            result.student.parentEmail ? result.student.parentEmail : "",
+          ]
+            .filter(Boolean)
+            .join(" · ");
+          showFeedback(
+            kind,
+            result.message,
+            [contact, emailNote].filter(Boolean).join(" · ")
+          );
+          toast(result.message);
+          await refreshActive();
+        } catch (err) {
+          if (err.status === 429) {
+            showFeedback("", "Hold on", err.message);
+          } else {
+            playTone("error");
+            showFeedback("err", "Scan failed", err.message);
+          }
+        } finally {
+          busy = false;
+          scanInput.value = "";
+          scanInput.focus();
+        }
+      }
+
+      scanInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          processCode(scanInput.value);
+        }
+      });
+
+      // Keep focus on scan box unless user is typing elsewhere
+      document.addEventListener("click", (e) => {
+        const t = e.target;
+        if (t.closest("input, textarea, select, button, a, .suggestions-list")) return;
+        scanInput.focus();
+      });
+
+      attachGlobalScanner((code) => processCode(code));
+
+      activeList.addEventListener("click", (e) => {
+        const btn = e.target.closest(".checkout-btn");
+        if (!btn) return;
+        processCode(btn.dataset.code, "force_out");
+      });
+
+      async function loadRoster() {
+        const data = await api("/api/students?includeInactive=false");
+        rosterCache = data.students || [];
+      }
+
+      function renderSuggestions(q) {
+        const query = q.trim().toLowerCase();
+        if (!query) {
+          suggestions.classList.remove("open");
+          suggestions.innerHTML = "";
+          return;
+        }
+        const matches = rosterCache
+          .filter(
+            (s) =>
+              s.name.toLowerCase().includes(query) ||
+              s.studentCode.toLowerCase().includes(query)
+          )
+          .slice(0, 8);
+        if (!matches.length) {
+          suggestions.classList.remove("open");
+          suggestions.innerHTML = "";
+          return;
+        }
+        suggestions.innerHTML = matches
+          .map(
+            (s) => `
+          <button type="button" class="suggestion-item" data-code="${escapeHtml(s.studentCode)}">
+            <strong>${escapeHtml(s.name)}</strong>
+            <span class="muted"> · ${escapeHtml(s.studentCode)}${s.isCheckedIn ? " · in centre" : ""}</span>
+          </button>`
+          )
+          .join("");
+        suggestions.classList.add("open");
+      }
+
+      manualSearch.addEventListener("input", () => renderSuggestions(manualSearch.value));
+      manualSearch.addEventListener("blur", () => setTimeout(() => suggestions.classList.remove("open"), 150));
+      suggestions.addEventListener("click", (e) => {
+        const btn = e.target.closest(".suggestion-item");
+        if (!btn) return;
+        manualSearch.value = "";
+        suggestions.classList.remove("open");
+        processCode(btn.dataset.code);
+      });
+
+      $("#camera-toggle").addEventListener("click", async () => {
+        const panel = $("#camera-panel");
+        if (cameraOn) {
+          if (html5QrCode) {
+            try { await html5QrCode.stop(); } catch { /* ignore */ }
+          }
+          panel.classList.remove("open");
+          cameraOn = false;
+          $("#camera-toggle").textContent = "Use camera";
+          scanInput.focus();
+          return;
+        }
+        if (!window.Html5Qrcode) {
+          toast("Camera library failed to load");
+          return;
+        }
+        panel.classList.add("open");
+        cameraOn = true;
+        $("#camera-toggle").textContent = "Stop camera";
+        html5QrCode = new Html5Qrcode("qr-reader");
+        try {
+          await html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 8, qrbox: { width: 240, height: 240 } },
+            (decoded) => {
+              if (decoded) processCode(decoded);
+            },
+            () => {}
+          );
+        } catch (err) {
+          cameraOn = false;
+          panel.classList.remove("open");
+          $("#camera-toggle").textContent = "Use camera";
+          showFeedback("err", "Camera unavailable", err.message || "Allow camera access or use the desk scanner");
+        }
+      });
+
+      loadSettingsBrand();
+      loadRoster().catch(() => {});
+      refreshActive().catch((err) => showFeedback("err", "Cannot load active list", err.message));
+      setInterval(() => refreshActive().catch(() => {}), 3000);
+      setInterval(tickTimers, 1000);
+    })();
+  </script>
+</body>
+</html>
