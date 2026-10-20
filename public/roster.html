@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Roster · Kumon Check-In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar no-print">
+      <div class="brand">Student Roster<span>Add students · print QR badges</span></div>
+      <nav class="nav">
+        <a href="/">Scan</a>
+        <a href="/roster.html" class="active">Roster</a>
+        <a href="/logs.html">Logs</a>
+        <a href="/settings.html">Settings</a>
+      </nav>
+    </header>
+
+    <section id="pin-gate" class="panel pin-gate no-print">
+      <h2>Staff PIN</h2>
+      <p class="muted">Enter the staff PIN to manage the roster.</p>
+      <form>
+        <div class="field">
+          <label class="label" for="pin">PIN</label>
+          <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="one-time-code" required />
+        </div>
+        <button type="submit">Unlock</button>
+        <p class="pin-error" style="color: var(--error); margin-top: 0.75rem;"></p>
+      </form>
+    </section>
+
+    <div id="staff-content" hidden>
+      <div class="grid-2 no-print">
+        <section class="panel">
+          <h2 id="form-title">Add student</h2>
+          <form id="student-form">
+            <input type="hidden" id="student-id" />
+            <div class="field">
+              <label class="label" for="student-code">Student ID / QR code</label>
+              <div class="row">
+                <input id="student-code" required placeholder="K-0001" style="flex: 1;" />
+                <button type="button" id="suggest-code" class="secondary">Suggest</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="student-name">Name</label>
+              <input id="student-name" required placeholder="Full name" />
+            </div>
+            <div class="field">
+              <span class="label">Subjects</span>
+              <div class="row">
+                <label class="checkbox-row"><input type="checkbox" id="subj-math" value="Math" /> Math</label>
+                <label class="checkbox-row"><input type="checkbox" id="subj-reading" value="Reading" /> Reading</label>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="parent-phone">Parent phone</label>
+              <input id="parent-phone" placeholder="Optional" />
+            </div>
+            <div class="field">
+              <label class="label" for="parent-email">Parent email</label>
+              <input id="parent-email" type="email" placeholder="parent@example.com" />
+            </div>
+            <div class="field">
+              <label class="checkbox-row"><input type="checkbox" id="student-active" checked /> Active student</label>
+            </div>
+            <div class="row">
+              <button type="submit" id="save-btn">Save student</button>
+              <button type="button" id="reset-btn" class="secondary">Clear</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Badge preview</h2>
+          <p class="muted">This QR is what the desk scanner reads for check-in / check-out. Print it and tape it to the student’s folder.</p>
+          <div class="badge-preview print-area">
+            <div class="badge-card" id="badge-card">
+              <div class="muted" id="badge-centre">Kumon Learning Centre</div>
+              <div id="badge-qr-wrap" style="min-height: 180px; display: flex; align-items: center; justify-content: center;">
+                <img id="badge-qr" alt="Student QR code" width="180" height="180" hidden />
+                <span id="badge-qr-placeholder" class="muted">Select a student → Badge</span>
+              </div>
+              <h3 id="badge-name">Student name</h3>
+              <div id="badge-code">K-0000</div>
+              <div class="tags" id="badge-subjects" style="justify-content: center; margin-top: 0.5rem;"></div>
+            </div>
+          </div>
+          <div class="row no-print" style="margin-top: 0.85rem;">
+            <button type="button" id="print-badge" class="secondary" disabled>Print badge</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel no-print">
+        <div class="row" style="justify-content: space-between; margin-bottom: 0.75rem;">
+          <h2 style="margin: 0;">All students</h2>
+          <input id="roster-filter" placeholder="Filter roster…" style="max-width: 260px;" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Subjects</th>
+                <th>Parent</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="roster-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    (() => {
+      const { api, $, playTone, subjectTags, escapeHtml, requireStaffPin, toast } = Kumon;
+      let students = [];
+      let selectedId = null;
+
+      async function boot() {
+        await requireStaffPin();
+        try {
+          const s = await api("/api/settings");
+          $("#badge-centre").textContent = s.centreName || "Kumon Learning Centre";
+        } catch { /* ignore */ }
+        await refresh();
+        await suggestCode();
+      }
+
+      async function suggestCode() {
+        const data = await api("/api/students/next-code");
+        if (!$("#student-id").value) {
+          $("#student-code").value = data.studentCode;
+        }
+      }
+
+      function resetForm() {
+        $("#student-form").reset();
+        $("#student-id").value = "";
+        $("#student-active").checked = true;
+        $("#form-title").textContent = "Add student";
+        $("#save-btn").textContent = "Save student";
+        selectedId = null;
+        $("#print-badge").disabled = true;
+        suggestCode().catch(() => {});
+      }
+
+      async function refresh() {
+        const data = await api("/api/students");
+        students = data.students || [];
+        renderTable($("#roster-filter").value);
+      }
+
+      function renderTable(filter = "") {
+        const q = filter.trim().toLowerCase();
+        const rows = students.filter((s) => {
+          if (!q) return true;
+          return (
+            s.name.toLowerCase().includes(q) ||
+            s.studentCode.toLowerCase().includes(q) ||
+            (s.parentEmail || "").toLowerCase().includes(q)
+          );
+        });
+        $("#roster-body").innerHTML = rows
+          .map(
+            (s) => `
+          <tr>
+            <td>${escapeHtml(s.studentCode)}</td>
+            <td>${escapeHtml(s.name)}</td>
+            <td><div class="tags">${subjectTags(s.subjects)}</div></td>
+            <td>
+              <div>${escapeHtml(s.parentEmail || "—")}</div>
+              <div class="muted">${escapeHtml(s.parentPhone || "")}</div>
+            </td>
+            <td>
+              ${s.isCheckedIn ? '<span class="badge in">In centre</span>' : ""}
+              ${s.active ? "" : '<span class="badge out">Inactive</span>'}
+            </td>
+            <td>
+              <div class="row">
+                <button type="button" class="secondary edit-btn" data-id="${s.id}">Edit</button>
+                <button type="button" class="secondary badge-btn" data-id="${s.id}">Badge</button>
+                <button type="button" class="danger delete-btn" data-id="${s.id}">Delete</button>
+              </div>
+            </td>
+          </tr>`
+          )
+          .join("");
+      }
+
+      function fillForm(s) {
+        $("#student-id").value = s.id;
+        $("#student-code").value = s.studentCode;
+        $("#student-name").value = s.name;
+        $("#parent-phone").value = s.parentPhone || "";
+        $("#parent-email").value = s.parentEmail || "";
+        $("#student-active").checked = s.active;
+        $("#subj-math").checked = s.subjects.includes("Math");
+        $("#subj-reading").checked = s.subjects.includes("Reading");
+        $("#form-title").textContent = "Edit student";
+        $("#save-btn").textContent = "Update student";
+        showBadge(s);
+      }
+
+      function showBadge(s) {
+        selectedId = s.id;
+        $("#badge-name").textContent = s.name;
+        $("#badge-code").textContent = s.studentCode;
+        $("#badge-subjects").innerHTML = subjectTags(s.subjects);
+        $("#print-badge").disabled = false;
+
+        const img = $("#badge-qr");
+        const placeholder = $("#badge-qr-placeholder");
+        img.onload = () => {
+          img.hidden = false;
+          if (placeholder) placeholder.hidden = true;
+        };
+        img.onerror = () => toast("Could not generate QR code");
+        img.src = `/api/students/qr.png?code=${encodeURIComponent(s.studentCode)}&size=180&t=${Date.now()}`;
+      }
+
+      $("#student-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const subjects = [];
+        if ($("#subj-math").checked) subjects.push("Math");
+        if ($("#subj-reading").checked) subjects.push("Reading");
+        const payload = {
+          studentCode: $("#student-code").value.trim(),
+          name: $("#student-name").value.trim(),
+          subjects,
+          parentPhone: $("#parent-phone").value.trim(),
+          parentEmail: $("#parent-email").value.trim(),
+          active: $("#student-active").checked,
+        };
+        try {
+          const id = $("#student-id").value;
+          if (id) {
+            await api(`/api/students/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+            toast("Student updated");
+          } else {
+            await api("/api/students", { method: "POST", body: JSON.stringify(payload) });
+            toast("Student added");
+          }
+          playTone("in");
+          resetForm();
+          await refresh();
+        } catch (err) {
+          playTone("error");
+          toast(err.message);
+        }
+      });
+
+      $("#reset-btn").addEventListener("click", resetForm);
+      $("#suggest-code").addEventListener("click", () => suggestCode().catch((e) => toast(e.message)));
+      $("#roster-filter").addEventListener("input", (e) => renderTable(e.target.value));
+      $("#print-badge").addEventListener("click", () => window.print());
+
+      $("#roster-body").addEventListener("click", async (e) => {
+        const edit = e.target.closest(".edit-btn");
+        const badge = e.target.closest(".badge-btn");
+        const del = e.target.closest(".delete-btn");
+        if (edit) {
+          const s = students.find((x) => String(x.id) === edit.dataset.id);
+          if (s) fillForm(s);
+        } else if (badge) {
+          const s = students.find((x) => String(x.id) === badge.dataset.id);
+          if (s) showBadge(s);
+        } else if (del) {
+          const s = students.find((x) => String(x.id) === del.dataset.id);
+          if (!s) return;
+          if (!confirm(`Delete ${s.name}? This cannot be undone.`)) return;
+          try {
+            await api(`/api/students/${s.id}`, { method: "DELETE" });
+            toast("Student deleted");
+            if (String(selectedId) === String(s.id)) resetForm();
+            await refresh();
+          } catch (err) {
+            toast(err.message);
+          }
+        }
+      });
+
+      boot().catch((err) => toast(err.message));
+    })();
+  </script>
+</body>
+</html>
