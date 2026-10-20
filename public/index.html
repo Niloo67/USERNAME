@@ -13,7 +13,7 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand" id="centre-brand">Kumon Check-In<span>Front desk · scanner ready</span></div>
+      <div class="brand" id="centre-brand">Kumon Check-In<span>Desk scanner ready</span></div>
       <nav class="nav no-print">
         <a href="/" class="active">Scan</a>
         <a href="/roster.html">Roster</a>
@@ -24,8 +24,17 @@
 
     <div class="grid-2">
       <section class="panel">
-        <h2>Scan student</h2>
-        <p class="muted">Plug in a USB/Bluetooth 2D QR scanner, or type a student code and press Enter. Camera is optional backup.</p>
+        <h2>Scan student badge</h2>
+        <ol class="scanner-steps">
+          <li>Each student has a <strong>QR badge</strong> (printed from Roster).</li>
+          <li>Plug a <strong>2D USB/Bluetooth scanner</strong> into this computer.</li>
+          <li>Aim the scanner at the badge — it types the student ID and presses Enter.</li>
+        </ol>
+
+        <div class="scanner-ready" id="scanner-ready">
+          <span class="pulse" aria-hidden="true"></span>
+          <span>Waiting for desk scanner…</span>
+        </div>
 
         <div class="mode-group" role="group" aria-label="Check-in mode">
           <button type="button" class="mode-btn active" data-mode="auto">Auto</button>
@@ -33,28 +42,70 @@
           <button type="button" class="mode-btn" data-mode="force_out">Force Check-Out</button>
         </div>
 
-        <label class="label" for="scan-input">Scanner / student code</label>
-        <input id="scan-input" class="scan-box" data-scan-input="1" autocomplete="off" autofocus placeholder="Scan badge or type K-0001" />
+        <!-- Hidden target: USB scanners type here like a keyboard, then send Enter -->
+        <label class="label" for="scan-input">Scanner target (keep this focused)</label>
+        <input
+          id="scan-input"
+          class="scan-box"
+          data-scan-input="1"
+          autocomplete="off"
+          autofocus
+          inputmode="none"
+          placeholder="Scan QR badge now"
+          aria-describedby="hid-hint"
+        />
+        <p class="hid-hint" id="hid-hint">
+          Leave this box focused. A USB/Bluetooth desk scanner types the student ID from the QR badge
+          and presses Enter by itself — you should not need to type at the desk.
+        </p>
 
-        <div class="field suggestions" style="margin-top: 0.85rem;">
-          <label class="label" for="manual-search">Manual search (name or ID)</label>
-          <input id="manual-search" autocomplete="off" placeholder="Start typing a name…" />
-          <div id="suggestions" class="suggestions-list"></div>
-        </div>
-
-        <div class="row" style="margin-top: 0.75rem;">
-          <button type="button" id="camera-toggle" class="secondary">Use camera</button>
-          <button type="button" id="refocus-scan" class="secondary">Focus scan box</button>
-        </div>
-
-        <div id="camera-panel" class="camera-panel">
-          <div id="qr-reader"></div>
-          <p class="muted" style="margin-top: 0.5rem;">Point the rear camera at a QR badge. Works best in good light.</p>
+        <div id="example-badge" class="live-badge-strip" hidden>
+          <img id="example-qr" alt="Example student QR" width="88" height="88" />
+          <div>
+            <div class="muted">Example badge QR on file</div>
+            <strong id="example-label">—</strong>
+            <div class="muted">Scanner reads this code → check-in / check-out</div>
+          </div>
         </div>
 
         <div id="feedback" class="feedback" aria-live="polite">
-          Ready to scan
+          Point the desk scanner at a student QR badge
         </div>
+
+        <details class="backup-details">
+          <summary>Backup options (camera, type, or test without hardware)</summary>
+
+          <div class="field suggestions" style="margin-top: 0.85rem;">
+            <label class="label" for="manual-search">Search by name (then tap to check in/out)</label>
+            <input id="manual-search" autocomplete="off" placeholder="Start typing a name…" />
+            <div id="suggestions" class="suggestions-list"></div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="manual-code">Type student ID (backup only)</label>
+            <div class="row">
+              <input id="manual-code" autocomplete="off" placeholder="e.g. K-0001" style="flex: 1;" />
+              <button type="button" id="manual-submit" class="secondary">Submit</button>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 0.75rem;">
+            <button type="button" id="camera-toggle" class="secondary">Phone camera</button>
+            <label class="btn secondary" style="display: inline-flex; align-items: center; gap: 0.35rem; margin: 0;">
+              Scan badge image
+              <input id="qr-file" type="file" accept="image/*" hidden />
+            </label>
+            <button type="button" id="sim-scan" class="secondary" title="Sends the same keystrokes a USB scanner sends">
+              Simulate desk scan
+            </button>
+            <button type="button" id="refocus-scan" class="secondary">Focus scanner box</button>
+          </div>
+
+          <div id="camera-panel" class="camera-panel">
+            <div id="qr-reader"></div>
+            <p class="muted" style="margin-top: 0.5rem;">Point the rear camera at a QR badge. Prefer the desk scanner for rush hour.</p>
+          </div>
+        </details>
       </section>
 
       <section class="panel">
@@ -79,6 +130,7 @@
       let cameraOn = false;
       let html5QrCode = null;
       let rosterCache = [];
+      let exampleCode = "";
 
       const scanInput = $("#scan-input");
       const feedback = $("#feedback");
@@ -87,17 +139,31 @@
       const activeCount = $("#active-count");
       const suggestions = $("#suggestions");
       const manualSearch = $("#manual-search");
+      const readyBanner = $("#scanner-ready");
+
+      // Some Bluetooth scanners paste instead of typing
+      scanInput.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData("text") || "";
+        if (text.trim()) processCode(text.trim());
+      });
 
       document.querySelectorAll(".mode-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
           mode = btn.dataset.mode;
-          scanInput.focus();
+          focusScanner();
         });
       });
 
-      $("#refocus-scan").addEventListener("click", () => scanInput.focus());
+      function focusScanner() {
+        scanInput.placeholder = "Scan QR badge now";
+        scanInput.focus();
+        readyBanner.querySelector("span:last-child").textContent = "Waiting for desk scanner…";
+      }
+
+      $("#refocus-scan").addEventListener("click", focusScanner);
 
       function showFeedback(kind, title, detail) {
         feedback.className = "feedback " + (kind || "");
@@ -108,7 +174,7 @@
         try {
           const s = await api("/api/settings");
           const brand = $("#centre-brand");
-          brand.innerHTML = `${escapeHtml(s.centreName)}<span>Front desk · scanner ready</span>`;
+          brand.innerHTML = `${escapeHtml(s.centreName)}<span>Desk scanner ready</span>`;
         } catch { /* ignore */ }
       }
 
@@ -146,6 +212,7 @@
         const cleaned = String(code || "").trim();
         if (!cleaned || busy) return;
         busy = true;
+        readyBanner.querySelector("span:last-child").textContent = `Processing ${cleaned}…`;
         try {
           const result = await api("/api/scan", {
             method: "POST",
@@ -182,10 +249,14 @@
         } finally {
           busy = false;
           scanInput.value = "";
-          scanInput.focus();
+          focusScanner();
         }
       }
 
+      /**
+       * Desk scanners type into the focused field and end with Enter.
+       * We also accept rapid bursts while this input is focused.
+       */
       scanInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
@@ -193,12 +264,14 @@
         }
       });
 
-      // Keep focus on scan box unless user is typing elsewhere
+      // Keep focus on scanner target unless user is using backup controls
       document.addEventListener("click", (e) => {
         const t = e.target;
-        if (t.closest("input, textarea, select, button, a, .suggestions-list")) return;
-        scanInput.focus();
+        if (t.closest("input, textarea, select, button, a, .suggestions-list, summary, details, label")) return;
+        focusScanner();
       });
+
+      window.addEventListener("focus", () => setTimeout(focusScanner, 50));
 
       attachGlobalScanner((code) => processCode(code));
 
@@ -211,6 +284,13 @@
       async function loadRoster() {
         const data = await api("/api/students?includeInactive=false");
         rosterCache = data.students || [];
+        if (rosterCache.length) {
+          const s = rosterCache[0];
+          exampleCode = s.studentCode;
+          $("#example-badge").hidden = false;
+          $("#example-label").textContent = `${s.name} · ${s.studentCode}`;
+          $("#example-qr").src = `/api/students/qr.png?code=${encodeURIComponent(s.studentCode)}&size=180`;
+        }
       }
 
       function renderSuggestions(q) {
@@ -254,6 +334,64 @@
         processCode(btn.dataset.code);
       });
 
+      $("#manual-submit").addEventListener("click", () => {
+        processCode($("#manual-code").value);
+        $("#manual-code").value = "";
+      });
+      $("#manual-code").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          processCode($("#manual-code").value);
+          $("#manual-code").value = "";
+        }
+      });
+
+      /**
+       * Injects the same signal a USB HID desk scanner sends:
+       * a fast character burst into the focused field, then Enter.
+       */
+      async function simulateDeskScanner(code) {
+        focusScanner();
+        scanInput.value = "";
+        const chars = String(code).split("");
+        for (const ch of chars) {
+          scanInput.value += ch;
+          scanInput.dispatchEvent(new Event("input", { bubbles: true }));
+          await new Promise((r) => setTimeout(r, 8));
+        }
+        scanInput.dispatchEvent(
+          new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })
+        );
+      }
+
+      $("#sim-scan").addEventListener("click", async () => {
+        const code = exampleCode || rosterCache[0]?.studentCode;
+        if (!code) {
+          toast("Add a student in Roster first, then print their QR badge");
+          return;
+        }
+        toast(`Simulating desk scanner → ${code}`);
+        await simulateDeskScanner(code);
+      });
+
+      $("#qr-file").addEventListener("change", async (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!file) return;
+        if (!window.Html5Qrcode) {
+          toast("QR decoder failed to load");
+          return;
+        }
+        try {
+          const decoder = new Html5Qrcode("qr-reader");
+          const decoded = await decoder.scanFile(file, true);
+          await processCode(decoded);
+        } catch (err) {
+          playTone("error");
+          showFeedback("err", "Could not read QR image", err.message || "Try a clearer badge photo");
+        }
+      });
+
       $("#camera-toggle").addEventListener("click", async () => {
         const panel = $("#camera-panel");
         if (cameraOn) {
@@ -262,8 +400,8 @@
           }
           panel.classList.remove("open");
           cameraOn = false;
-          $("#camera-toggle").textContent = "Use camera";
-          scanInput.focus();
+          $("#camera-toggle").textContent = "Phone camera";
+          focusScanner();
           return;
         }
         if (!window.Html5Qrcode) {
@@ -286,14 +424,15 @@
         } catch (err) {
           cameraOn = false;
           panel.classList.remove("open");
-          $("#camera-toggle").textContent = "Use camera";
-          showFeedback("err", "Camera unavailable", err.message || "Allow camera access or use the desk scanner");
+          $("#camera-toggle").textContent = "Phone camera";
+          showFeedback("err", "Camera unavailable", err.message || "Use the desk scanner instead");
         }
       });
 
       loadSettingsBrand();
       loadRoster().catch(() => {});
       refreshActive().catch((err) => showFeedback("err", "Cannot load active list", err.message));
+      focusScanner();
       setInterval(() => refreshActive().catch(() => {}), 3000);
       setInterval(tickTimers, 1000);
     })();
