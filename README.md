@@ -69,7 +69,7 @@ Open `http://localhost:3000` on the desk PC. On other devices: `http://<desk-pc-
 1. Start the app on the desk computer; leave **Scan** open (scanner target stays focused).
 2. Plug in the 2D scanner.
 3. Modes: **Auto** (toggles in/out), **Force Check-In**, **Force Check-Out**.
-4. Backups (under “Backup options”): phone camera, search by name, or scan a badge photo.
+4. Backups: **Manual / camera backup** on the Scan page (search by name, type ID, phone camera, or badge photo). **Simulate desk scan** mimics a USB scanner when you have no hardware yet.
 5. Export history from **Logs**.
 
 ## Backup

@@ -273,23 +273,10 @@ textarea {
   color: var(--ink);
 }
 
-.backup-details {
+.backup-panel {
   margin-top: 0.85rem;
   border-top: 1px dashed var(--line);
   padding-top: 0.85rem;
-}
-
-.backup-details summary {
-  cursor: pointer;
-  font-weight: 700;
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  list-style: none;
-}
-
-.backup-details summary::-webkit-details-marker {
-  display: none;
 }
 
 .live-badge-strip {

@@ -72,9 +72,17 @@
           Point the desk scanner at a student QR badge
         </div>
 
-        <details class="backup-details">
-          <summary>Backup options (camera, type, or test without hardware)</summary>
+        <div class="row" style="margin-top: 0.85rem;">
+          <button type="button" id="refocus-scan" class="secondary">Focus scanner box</button>
+          <button type="button" id="sim-scan" class="secondary" title="Sends the same keystrokes a USB scanner sends">
+            Simulate desk scan
+          </button>
+          <button type="button" id="backup-toggle" class="secondary" aria-expanded="false" aria-controls="backup-panel">
+            Manual / camera backup
+          </button>
+        </div>
 
+        <div id="backup-panel" class="backup-panel" hidden>
           <div class="field suggestions" style="margin-top: 0.85rem;">
             <label class="label" for="manual-search">Search by name (then tap to check in/out)</label>
             <input id="manual-search" autocomplete="off" placeholder="Start typing a name…" />
@@ -95,17 +103,13 @@
               Scan badge image
               <input id="qr-file" type="file" accept="image/*" hidden />
             </label>
-            <button type="button" id="sim-scan" class="secondary" title="Sends the same keystrokes a USB scanner sends">
-              Simulate desk scan
-            </button>
-            <button type="button" id="refocus-scan" class="secondary">Focus scanner box</button>
           </div>
 
           <div id="camera-panel" class="camera-panel">
             <div id="qr-reader"></div>
             <p class="muted" style="margin-top: 0.5rem;">Point the rear camera at a QR badge. Prefer the desk scanner for rush hour.</p>
           </div>
-        </details>
+        </div>
       </section>
 
       <section class="panel">
@@ -164,6 +168,14 @@
       }
 
       $("#refocus-scan").addEventListener("click", focusScanner);
+
+      $("#backup-toggle").addEventListener("click", () => {
+        const panel = $("#backup-panel");
+        const open = panel.hidden;
+        panel.hidden = !open;
+        $("#backup-toggle").setAttribute("aria-expanded", open ? "true" : "false");
+        if (!open) focusScanner();
+      });
 
       function showFeedback(kind, title, detail) {
         feedback.className = "feedback " + (kind || "");
