@@ -18,7 +18,7 @@ router.get("/", (_req, res) => {
 router.put("/", (req, res) => {
   const body = req.body || {};
   if (body.centreName !== undefined) {
-    setSetting("centre_name", String(body.centreName).trim() || "Kumon Learning Centre");
+    setSetting("centre_name", String(body.centreName).trim() || "Kumon NDG Learning Centre");
   }
   if (body.emailOnCheckin !== undefined) {
     setSetting("email_on_checkin", body.emailOnCheckin ? "true" : "false");

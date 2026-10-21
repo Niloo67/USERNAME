@@ -82,7 +82,7 @@
           <p class="muted">This QR is what the desk scanner reads for check-in / check-out. Print it and tape it to the student’s folder.</p>
           <div class="badge-preview print-area">
             <div class="badge-card" id="badge-card">
-              <div class="muted" id="badge-centre">Kumon Learning Centre</div>
+              <div class="muted" id="badge-centre">Kumon NDG Learning Centre</div>
               <div id="badge-qr-wrap" style="min-height: 180px; display: flex; align-items: center; justify-content: center;">
                 <img id="badge-qr" alt="Student QR code" width="180" height="180" hidden />
                 <span id="badge-qr-placeholder" class="muted">Select a student → Badge</span>
@@ -133,7 +133,7 @@
         await requireStaffPin();
         try {
           const s = await api("/api/settings");
-          $("#badge-centre").textContent = s.centreName || "Kumon Learning Centre";
+          $("#badge-centre").textContent = s.centreName || "Kumon NDG Learning Centre";
         } catch { /* ignore */ }
         await refresh();
         await suggestCode();

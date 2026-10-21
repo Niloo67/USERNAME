@@ -57,7 +57,7 @@ async function notifyParent({ student, action, timestamp }) {
     return { status: "skipped", detail: "SMTP not configured" };
   }
 
-  const centreName = getSetting("centre_name", process.env.CENTRE_NAME || "Kumon Learning Centre");
+  const centreName = getSetting("centre_name", process.env.CENTRE_NAME || "Kumon NDG Learning Centre");
   const actionLabel = action === "check_in" ? "checked in" : "checked out";
   const when = timestamp || new Date().toLocaleString();
   const subject = `${student.name} ${actionLabel} at ${centreName}`;
@@ -92,7 +92,7 @@ function getEmailStatus() {
     smtpConfigured: smtpConfigured(),
     emailOnCheckin: getSetting("email_on_checkin", "true") === "true",
     emailOnCheckout: getSetting("email_on_checkout", "true") === "true",
-    centreName: getSetting("centre_name", process.env.CENTRE_NAME || "Kumon Learning Centre"),
+    centreName: getSetting("centre_name", process.env.CENTRE_NAME || "Kumon NDG Learning Centre"),
   };
 }
 

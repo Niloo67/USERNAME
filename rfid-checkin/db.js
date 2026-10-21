@@ -85,7 +85,7 @@ function ensureDefaultSettings() {
   const defaults = {
     email_on_checkin: process.env.EMAIL_ON_CHECKIN !== "false" ? "true" : "false",
     email_on_checkout: process.env.EMAIL_ON_CHECKOUT !== "false" ? "true" : "false",
-    centre_name: process.env.CENTRE_NAME || "Kumon Learning Centre",
+    centre_name: process.env.CENTRE_NAME || "Kumon NDG Learning Centre",
   };
   for (const [key, value] of Object.entries(defaults)) {
     if (getSetting(key) === null) {
