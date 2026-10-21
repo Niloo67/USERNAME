@@ -1,4 +1,4 @@
-# Kumon Check-In — two separate apps
+# Kumon NDG – Check-In / Check-Out — two separate apps
 
 You can try either system. They are **independent** folders with their own database.
 

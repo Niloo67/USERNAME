@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kumon Check-In</title>
+  <title>Kumon NDG – Check-In / Check-Out</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -13,7 +13,7 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand" id="centre-brand">Kumon Check-In<span>Desk scanner ready</span></div>
+      <div class="brand" id="centre-brand">Kumon NDG – Check-In / Check-Out<span>QR / barcode · desk scanner</span></div>
       <nav class="nav no-print">
         <a href="/" class="active">Scan</a>
         <a href="/roster.html">Roster</a>
@@ -185,8 +185,9 @@
       async function loadSettingsBrand() {
         try {
           const s = await api("/api/settings");
-          const brand = $("#centre-brand");
-          brand.innerHTML = `${escapeHtml(s.centreName)}<span>Desk scanner ready</span>`;
+          const centre = s.centreName || "Kumon NDG Learning Centre";
+          $("#centre-brand").innerHTML =
+            `Kumon NDG – Check-In / Check-Out<span>${escapeHtml(centre)} · QR / barcode</span>`;
         } catch { /* ignore */ }
       }
 

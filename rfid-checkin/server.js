@@ -29,7 +29,7 @@ app.use((err, _req, res, _next) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Kumon RFID Check-In at http://localhost:${PORT}`);
+  console.log(`Kumon NDG – Check-In / Check-Out (RFID) at http://localhost:${PORT}`);
   console.log(`Tap USB RFID/NFC reader → browser checks students in/out`);
   console.log(`On centre Wi-Fi: http://<this-computer-ip>:${PORT}`);
 });

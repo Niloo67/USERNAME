@@ -1,4 +1,4 @@
-# Kumon Check-In — RFID / NFC tag version
+# Kumon NDG – Check-In / Check-Out — RFID / NFC tag version
 
 USB **RFID/NFC reader** + tags on student folders. Tap to check in/out. Parent email on both events.
 

@@ -29,6 +29,6 @@ app.use((err, _req, res, _next) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Kumon Check-In running at http://localhost:${PORT}`);
+  console.log(`Kumon NDG – Check-In / Check-Out (QR) at http://localhost:${PORT}`);
   console.log(`On the centre Wi-Fi, open http://<this-computer-ip>:${PORT}`);
 });

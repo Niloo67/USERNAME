@@ -1,4 +1,4 @@
-# Kumon Check-In — QR / barcode version
+# Kumon NDG – Check-In / Check-Out — QR / barcode version
 
 Desk **2D QR scanner** + printed badges on student folders. Parent email on check-in/out (optional SMTP).
 

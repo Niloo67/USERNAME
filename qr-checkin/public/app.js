@@ -1,4 +1,4 @@
-/* Shared helpers for Kumon Check-In pages */
+/* Shared helpers for Kumon NDG – Check-In / Check-Out pages */
 
 const Kumon = (() => {
   const PIN_KEY = "kumon_staff_unlocked";
