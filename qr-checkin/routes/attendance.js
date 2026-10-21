@@ -9,6 +9,8 @@ const {
   listLogs,
 } = require("../db");
 const { notifyParent } = require("../services/email");
+const { requireStaff } = require("../middleware/auth");
+const { toPublicStudent, scrubAttendanceResult } = require("../lib/pii");
 
 const router = express.Router();
 
@@ -94,13 +96,16 @@ async function performAttendance({ student, mode }) {
 }
 
 router.get("/active", (_req, res) => {
-  res.json({ students: listActiveSessions() });
+  res.json({ students: listActiveSessions().map(toPublicStudent) });
 });
 
-router.get("/logs", (req, res) => {
+router.get("/logs", requireStaff, (req, res) => {
   const q = String(req.query.q || "").trim();
   const date = String(req.query.date || "").trim();
-  res.json({ logs: listLogs({ q, date }) });
+  const from = String(req.query.from || "").trim();
+  const to = String(req.query.to || "").trim();
+  const limit = Number(req.query.limit) || 2000;
+  res.json({ logs: listLogs({ q, date, from, to, limit }) });
 });
 
 router.post("/scan", async (req, res) => {
@@ -120,7 +125,7 @@ router.post("/scan", async (req, res) => {
 
     const mode = resolveMode(req.body?.mode);
     const result = await performAttendance({ student, mode });
-    res.json(result);
+    res.json(scrubAttendanceResult(result));
   } catch (err) {
     res.status(err.status || 500).json({
       error: err.message || "Scan failed",
@@ -133,7 +138,7 @@ router.post("/check-in", async (req, res) => {
   try {
     const student = resolveStudent(req.body);
     const result = await performAttendance({ student, mode: "force_in" });
-    res.json(result);
+    res.json(scrubAttendanceResult(result));
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message || "Check-in failed" });
   }
@@ -143,7 +148,7 @@ router.post("/check-out", async (req, res) => {
   try {
     const student = resolveStudent(req.body);
     const result = await performAttendance({ student, mode: "force_out" });
-    res.json(result);
+    res.json(scrubAttendanceResult(result));
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message || "Check-out failed" });
   }

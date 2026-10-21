@@ -335,8 +335,18 @@ function clearTag(studentId) {
   return getStudentById(studentId);
 }
 
+/** Soft-delete: deactivate + clear tag; keep attendance history (≥ 2 years). */
 function deleteStudent(id) {
-  const info = db.prepare("DELETE FROM students WHERE id = ?").run(id);
+  const existing = getStudentById(id);
+  if (!existing) return false;
+  db.prepare("DELETE FROM sessions WHERE student_id = ?").run(id);
+  const info = db
+    .prepare(
+      `UPDATE students
+       SET active = 0, tag_uid = NULL, updated_at = datetime('now', 'localtime')
+       WHERE id = ?`
+    )
+    .run(id);
   return info.changes > 0;
 }
 
@@ -399,20 +409,30 @@ function checkOutStudent(studentId) {
   return getStudentById(studentId);
 }
 
-function listLogs({ q = "", date = "", limit = 500 } = {}) {
+function listLogs({ q = "", date = "", from = "", to = "", limit = 500 } = {}) {
   const params = [];
   let sql = `SELECT * FROM logs WHERE 1 = 1`;
   if (date) {
     sql += " AND date(timestamp) = date(?)";
     params.push(date);
+  } else {
+    if (from) {
+      sql += " AND date(timestamp) >= date(?)";
+      params.push(from);
+    }
+    if (to) {
+      sql += " AND date(timestamp) <= date(?)";
+      params.push(to);
+    }
   }
   if (q) {
     sql += " AND (student_name LIKE ? OR student_code LIKE ?)";
     const like = `%${q}%`;
     params.push(like, like);
   }
+  const lim = Math.min(Math.max(Number(limit) || 500, 1), 100000);
   sql += " ORDER BY timestamp DESC, id DESC LIMIT ?";
-  params.push(Math.min(Number(limit) || 500, 5000));
+  params.push(lim);
   return db.prepare(sql).all(...params).map((row) => ({
     id: row.id,
     studentId: row.student_id,
@@ -423,6 +443,41 @@ function listLogs({ q = "", date = "", limit = 500 } = {}) {
     timestamp: row.timestamp,
     emailStatus: row.email_status,
     emailDetail: row.email_detail,
+  }));
+}
+
+function getRetentionInfo() {
+  const row = db
+    .prepare(
+      `SELECT MIN(timestamp) AS oldest, MAX(timestamp) AS newest, COUNT(*) AS count FROM logs`
+    )
+    .get();
+  let daysOfHistory = null;
+  if (row?.oldest && row?.newest) {
+    const a = new Date(String(row.oldest).replace(" ", "T")).getTime();
+    const b = new Date(String(row.newest).replace(" ", "T")).getTime();
+    if (!Number.isNaN(a) && !Number.isNaN(b)) {
+      daysOfHistory = Math.max(0, Math.floor((b - a) / (24 * 60 * 60 * 1000)));
+    }
+  }
+  return {
+    oldestLog: row?.oldest || null,
+    newestLog: row?.newest || null,
+    logCount: row?.count || 0,
+    daysOfHistory,
+  };
+}
+
+function listDirectoryStudents() {
+  return listStudents({ includeInactive: false }).map((s) => ({
+    id: s.id,
+    studentCode: s.studentCode,
+    name: s.name,
+    subjects: s.subjects,
+    active: s.active,
+    checkedInAt: s.checkedInAt,
+    isCheckedIn: s.isCheckedIn,
+    tagLinked: Boolean(s.tagUid),
   }));
 }
 
@@ -441,10 +496,13 @@ function nextStudentCode() {
 
 module.exports = {
   db,
+  dbPath,
+  dataDir,
   normalizeTagUid,
   getSetting,
   setSetting,
   listStudents,
+  listDirectoryStudents,
   getStudentById,
   getStudentByCode,
   getStudentByTagUid,
@@ -459,5 +517,6 @@ module.exports = {
   checkInStudent,
   checkOutStudent,
   listLogs,
+  getRetentionInfo,
   nextStudentCode,
 };

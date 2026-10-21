@@ -1,5 +1,6 @@
 const express = require("express");
 const { listLogs } = require("../db");
+const { requireStaff } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -11,10 +12,12 @@ function csvEscape(value) {
   return str;
 }
 
-router.get("/csv", (req, res) => {
+router.get("/csv", requireStaff, (req, res) => {
   const q = String(req.query.q || "").trim();
   const date = String(req.query.date || "").trim();
-  const logs = listLogs({ q, date, limit: 5000 });
+  const from = String(req.query.from || "").trim();
+  const to = String(req.query.to || "").trim();
+  const logs = listLogs({ q, date, from, to, limit: 100000 });
 
   const header = [
     "Timestamp",
@@ -41,7 +44,10 @@ router.get("/csv", (req, res) => {
     );
   }
 
-  const filename = date ? `attendance-${date}.csv` : "attendance-export.csv";
+  let filename = "attendance-export.csv";
+  if (date) filename = `attendance-${date}.csv`;
+  else if (from || to) filename = `attendance-${from || "start"}_to_${to || "end"}.csv`;
+
   res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
   res.send(lines.join("\n"));

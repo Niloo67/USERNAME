@@ -2,12 +2,14 @@ const express = require("express");
 const QRCode = require("qrcode");
 const {
   listStudents,
+  listDirectoryStudents,
   getStudentById,
   createStudent,
   updateStudent,
   deleteStudent,
   nextStudentCode,
 } = require("../db");
+const { requireStaff } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -25,14 +27,9 @@ function normalizeSubjects(input) {
     .filter(Boolean);
 }
 
-router.get("/", (req, res) => {
-  const q = String(req.query.q || "").trim();
-  const includeInactive = req.query.includeInactive !== "false";
-  res.json({ students: listStudents({ q, includeInactive }) });
-});
-
-router.get("/next-code", (_req, res) => {
-  res.json({ studentCode: nextStudentCode() });
+/** Public desk directory — name + ID only (no parent PII). */
+router.get("/directory", (_req, res) => {
+  res.json({ students: listDirectoryStudents() });
 });
 
 router.get("/qr.png", async (req, res) => {
@@ -55,7 +52,17 @@ router.get("/qr.png", async (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
+router.get("/", requireStaff, (req, res) => {
+  const q = String(req.query.q || "").trim();
+  const includeInactive = req.query.includeInactive !== "false";
+  res.json({ students: listStudents({ q, includeInactive }) });
+});
+
+router.get("/next-code", requireStaff, (_req, res) => {
+  res.json({ studentCode: nextStudentCode() });
+});
+
+router.get("/:id", requireStaff, (req, res) => {
   const student = getStudentById(Number(req.params.id));
   if (!student) {
     return res.status(404).json({ error: "Student not found" });
@@ -63,7 +70,7 @@ router.get("/:id", (req, res) => {
   res.json({ student });
 });
 
-router.post("/", (req, res) => {
+router.post("/", requireStaff, (req, res) => {
   try {
     const body = req.body || {};
     const student = createStudent({
@@ -80,7 +87,7 @@ router.post("/", (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", requireStaff, (req, res) => {
   try {
     const body = req.body || {};
     const fields = { ...body };
@@ -94,12 +101,15 @@ router.put("/:id", (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", requireStaff, (req, res) => {
   const ok = deleteStudent(Number(req.params.id));
   if (!ok) {
     return res.status(404).json({ error: "Student not found" });
   }
-  res.json({ ok: true });
+  res.json({
+    ok: true,
+    message: "Student deactivated. Attendance history is kept for at least 2 years.",
+  });
 });
 
 module.exports = router;

@@ -2,6 +2,7 @@
 
 const Kumon = (() => {
   const PIN_KEY = "kumon_staff_unlocked";
+  const TOKEN_KEY = "kumon_staff_token";
 
   function $(sel, root = document) {
     return root.querySelector(sel);
@@ -11,10 +12,26 @@ const Kumon = (() => {
     return Array.from(root.querySelectorAll(sel));
   }
 
+  function getStaffToken() {
+    return sessionStorage.getItem(TOKEN_KEY) || "";
+  }
+
+  function setStaffToken(token) {
+    if (token) sessionStorage.setItem(TOKEN_KEY, token);
+    else sessionStorage.removeItem(TOKEN_KEY);
+  }
+
   async function api(path, options = {}) {
+    const headers = {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    };
+    const token = getStaffToken();
+    if (token) headers["X-Staff-Token"] = token;
+
     const res = await fetch(path, {
-      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
       ...options,
+      headers,
     });
     const text = await res.text();
     let data = null;
@@ -24,12 +41,41 @@ const Kumon = (() => {
       data = { error: text || "Invalid response" };
     }
     if (!res.ok) {
+      if (res.status === 401 && data?.code === "auth_required") {
+        setUnlocked(false);
+        setStaffToken("");
+      }
       const err = new Error((data && data.error) || `Request failed (${res.status})`);
       err.status = res.status;
       err.data = data;
       throw err;
     }
     return data;
+  }
+
+  async function downloadWithAuth(url, filename) {
+    const headers = {};
+    const token = getStaffToken();
+    if (token) headers["X-Staff-Token"] = token;
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      let msg = `Download failed (${res.status})`;
+      try {
+        const data = await res.json();
+        if (data?.error) msg = data.error;
+      } catch {
+        /* ignore */
+      }
+      throw new Error(msg);
+    }
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename || "download";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
   }
 
   function toast(message) {
@@ -99,7 +145,7 @@ const Kumon = (() => {
   }
 
   function isUnlocked() {
-    return sessionStorage.getItem(PIN_KEY) === "1";
+    return sessionStorage.getItem(PIN_KEY) === "1" && Boolean(getStaffToken());
   }
 
   function setUnlocked(ok) {
@@ -129,11 +175,15 @@ const Kumon = (() => {
         e.preventDefault();
         err.textContent = "";
         try {
-          await api("/api/settings/verify-pin", {
+          const data = await api("/api/settings/verify-pin", {
             method: "POST",
             body: JSON.stringify({ pin: input.value }),
           });
+          setStaffToken(data.token || "");
           setUnlocked(true);
+          if (data.defaultPinWarning) {
+            toast("Change STAFF_PIN from 1234 in .env for better security");
+          }
           gate.hidden = true;
           content.hidden = false;
           resolve(true);
@@ -161,7 +211,7 @@ const Kumon = (() => {
   }
 
   /**
-   * Global HID barcode capture: when focus is not in another text field,
+   * Global HID barcode/RFID capture: when focus is not in another text field,
    * buffer rapid keystrokes ending in Enter.
    */
   function attachGlobalScanner(onScan) {
@@ -174,7 +224,6 @@ const Kumon = (() => {
       const isTypingField =
         tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || e.target.isContentEditable;
       if (isTypingField) {
-        // Dedicated scan input handles itself
         if (e.target.dataset && e.target.dataset.scanInput === "1") return;
         buffer = "";
         return;
@@ -219,6 +268,7 @@ const Kumon = (() => {
     $,
     $all,
     api,
+    downloadWithAuth,
     toast,
     formatDuration,
     playTone,
@@ -228,5 +278,6 @@ const Kumon = (() => {
     attachGlobalScanner,
     isUnlocked,
     setUnlocked,
+    getStaffToken,
   };
 })();

@@ -25,8 +25,12 @@ Open `http://localhost:3000`
 
 ## Daily use
 
-1. Add students + parent email in Roster  
-2. Print QR badge → tape to folder  
-3. Leave Scan page open → scan badge to check in/out  
+1. Set a strong `STAFF_PIN` in `.env`  
+2. Add students + parent email in Roster  
+3. Print QR badge → tape to folder  
+4. Leave Scan page open → scan badge when students **arrive** and **leave**  
+5. Weekly: Settings → **Create backup** → copy `data/backups/` to USB/cloud (keep ≥ 2 years)  
+
+Franchise checklist + staff procedure: [STAFF_SOP.md](../STAFF_SOP.md) and Settings → Franchise baseline checklist.
 
 See the root [README](../README.md) for Windows laptop setup and comparison with the RFID version.

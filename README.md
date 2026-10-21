@@ -88,4 +88,19 @@ Gmail: enable 2-Step Verification → create an App Password.
 
 ## Staff PIN
 
-Default in `.env.example` is `1234`. Change `STAFF_PIN` before using with real families.
+Set a strong `STAFF_PIN` in `.env` before using with real families (do not leave the example placeholder).
+
+## Franchise baseline requirements
+
+This project is built to support Kumon’s check-in/check-out baseline checklist:
+
+1. Digital system (not paper/Excel as the baseline)  
+2. Unique student ID (code + QR or RFID tag)  
+3. Actual arrival/departure via live scan/tap  
+4. Staff PIN + [STAFF_SOP.md](STAFF_SOP.md) training procedure  
+5. Live “Who is here” + Logs history / CSV export  
+6. Settings → **Create backup** (`data/backups/`) — copy weekly to USB/cloud  
+7. Parent PII is PIN-protected; desk screen does not show parent phone/email  
+8. Attendance logs are never auto-deleted — retain / back up for **≥ 2 years**  
+
+See Settings → Franchise baseline checklist inside either app.

@@ -13,7 +13,7 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand">Settings<span>Centre name · parent emails</span></div>
+      <div class="brand">Settings<span>Centre · backup · franchise checklist</span></div>
       <nav class="nav">
         <a href="/">Scan</a>
         <a href="/roster.html">Roster</a>
@@ -24,7 +24,7 @@
 
     <section id="pin-gate" class="panel pin-gate">
       <h2>Staff PIN</h2>
-      <p class="muted">Enter the staff PIN to change settings.</p>
+      <p class="muted">Enter the staff PIN to change settings and view compliance tools.</p>
       <form>
         <div class="field">
           <label class="label" for="pin">PIN</label>
@@ -40,11 +40,12 @@
         <h2>Centre</h2>
         <form id="settings-form">
           <div class="field">
-            <label class="label" for="centre-name">Centre name</label>
+            <label class="label" for="centre-name">Centre name (emails &amp; badges)</label>
             <input id="centre-name" required />
           </div>
           <h3 style="margin-top: 1.25rem;">Parent email alerts</h3>
           <p class="muted" id="smtp-status">Checking SMTP…</p>
+          <p class="muted" id="pin-status"></p>
           <div class="field">
             <label class="checkbox-row">
               <input type="checkbox" id="email-on-checkin" />
@@ -62,15 +63,45 @@
       </section>
 
       <section class="panel">
+        <h2>Backup &amp; 2-year retention</h2>
+        <p class="muted" id="compliance-status">Loading…</p>
+        <div class="row" style="margin-top: 1rem;">
+          <button type="button" id="backup-btn">Create backup now</button>
+          <button type="button" id="refresh-compliance" class="secondary">Refresh status</button>
+        </div>
+        <p class="muted" style="margin-top: 0.75rem;">
+          Backups are saved under <code>data/backups/</code> on this computer.
+          Copy that folder to a USB drive or cloud <strong>weekly</strong>. Keep backups for at least <strong>2 years</strong>.
+        </p>
+        <ul id="backup-list" class="muted" style="margin-top: 0.75rem; line-height: 1.6;"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Franchise baseline checklist</h2>
+        <ol class="muted" style="line-height: 1.7;">
+          <li><strong>Digital system</strong> — This app is the centre’s digital check-in/check-out (not paper/Excel as the baseline).</li>
+          <li><strong>Unique student ID</strong> — Each student has a unique code (and QR badge or RFID tag).</li>
+          <li><strong>Actual arrival/departure</strong> — Scan/tap at the desk when the student arrives and leaves (do not backfill later).</li>
+          <li><strong>Staff oversight</strong> — Train staff using the SOP below; use the Staff PIN for roster, logs, and settings.</li>
+          <li><strong>Who is here + history</strong> — Desk “Who is here” list; Logs page for historical review/export.</li>
+          <li><strong>Backup</strong> — Use “Create backup now” and copy <code>data/backups/</code> off this laptop weekly. Paper sign-in only if the laptop is down.</li>
+          <li><strong>PII</strong> — Parent contact is PIN-protected; desk scan screen does not show parent phone/email.</li>
+          <li><strong>Retain ≥ 2 years</strong> — Logs are never auto-deleted; keep database + backup copies for at least two years.</li>
+        </ol>
+      </section>
+
+      <section class="panel">
         <h2>How to run this centre</h2>
         <ol class="muted" style="line-height: 1.6;">
-          <li>Keep this app running on the main desk computer (`npm start`).</li>
-          <li>Buy a <strong>2D</strong> USB QR scanner (not 1D laser). Plug it in — it types like a keyboard.</li>
-          <li>Open this page on the desk browser and leave the Scan tab ready.</li>
-          <li>Other phones/tablets on centre Wi‑Fi can open the same address for a live “who is here” list.</li>
-          <li>Add SMTP details in the server `.env` file to enable parent emails (Gmail App Password works).</li>
-          <li>Backup: copy <code>data/kumon.sqlite</code> or export CSV from Logs.</li>
+          <li>Keep this app running on the main desk computer (<code>npm start</code>).</li>
+          <li>Buy a <strong>2D</strong> USB QR scanner. Plug it in — it types like a keyboard.</li>
+          <li>Open the Scan tab and leave it ready. Set the Windows clock correctly.</li>
+          <li>Other devices on centre Wi‑Fi can open the same address for a live “who is here” list (no parent PII).</li>
+          <li>Change <code>STAFF_PIN</code> in <code>.env</code> from the default <code>1234</code>.</li>
+          <li>Add SMTP details in <code>.env</code> for parent emails (optional).</li>
+          <li>Weekly: create a backup and copy <code>data/backups/</code> to USB/cloud.</li>
         </ol>
+        <p class="muted">Full staff procedure: see <code>STAFF_SOP.md</code> in the project folder.</p>
       </section>
     </div>
   </div>
@@ -78,7 +109,29 @@
   <script src="/app.js"></script>
   <script>
     (() => {
-      const { api, $, requireStaffPin, toast, playTone } = Kumon;
+      const { api, $, requireStaffPin, toast, playTone, downloadWithAuth } = Kumon;
+
+      async function loadCompliance() {
+        const c = await api("/api/backup/compliance");
+        const oldest = c.oldestLog || "none yet";
+        const newest = c.newestLog || "none yet";
+        $("#compliance-status").textContent =
+          `Logs: ${c.logCount} entries · oldest ${oldest} · newest ${newest}. ` +
+          `Auto-purge is off. Retention policy: ≥ ${c.retentionYearsRequired} years. ` +
+          `On-disk backups: ${c.backupCount}.`;
+        const list = $("#backup-list");
+        const files = (c.backups || []).slice(0, 8);
+        if (!files.length) {
+          list.innerHTML = "<li>No backup files yet — click Create backup now.</li>";
+          return;
+        }
+        list.innerHTML = files
+          .map(
+            (f) =>
+              `<li><a href="#" data-file="${f.name}">${f.name}</a> · ${Math.round(f.size / 1024)} KB · ${f.modifiedAt.slice(0, 10)}</li>`
+          )
+          .join("");
+      }
 
       async function boot() {
         await requireStaffPin();
@@ -89,6 +142,16 @@
         $("#smtp-status").textContent = s.smtpConfigured
           ? "SMTP is configured — emails can send."
           : "SMTP is not configured yet. Fill SMTP_* values in .env, then restart the server. Check-in still works without email.";
+        if (!s.staffPinConfigured) {
+          $("#pin-status").textContent =
+            "WARNING: STAFF_PIN is not set in .env — set one before using with real student data.";
+        } else if (s.usingDefaultPin) {
+          $("#pin-status").textContent =
+            "WARNING: STAFF_PIN is still 1234 — change it in .env.";
+        } else {
+          $("#pin-status").textContent = "Staff PIN is configured.";
+        }
+        await loadCompliance();
       }
 
       $("#settings-form").addEventListener("submit", async (e) => {
@@ -108,6 +171,31 @@
           playTone("error");
           toast(err.message);
         }
+      });
+
+      $("#backup-btn").addEventListener("click", async () => {
+        try {
+          const result = await api("/api/backup", { method: "POST", body: "{}" });
+          playTone("in");
+          toast(`Backup saved (${result.logCount} log rows)`);
+          await loadCompliance();
+        } catch (err) {
+          playTone("error");
+          toast(err.message);
+        }
+      });
+
+      $("#refresh-compliance").addEventListener("click", () =>
+        loadCompliance().catch((e) => toast(e.message))
+      );
+
+      $("#backup-list").addEventListener("click", (e) => {
+        const a = e.target.closest("a[data-file]");
+        if (!a) return;
+        e.preventDefault();
+        downloadWithAuth("/api/backup/download/" + encodeURIComponent(a.dataset.file), a.dataset.file).catch(
+          (err) => toast(err.message)
+        );
       });
 
       boot().catch((err) => toast(err.message));

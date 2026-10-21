@@ -38,9 +38,13 @@
     <div id="staff-content" hidden>
       <section class="panel">
         <div class="row" style="margin-bottom: 1rem;">
-          <div class="field" style="margin: 0; flex: 1; min-width: 160px;">
-            <label class="label" for="filter-date">Date</label>
-            <input type="date" id="filter-date" />
+          <div class="field" style="margin: 0; flex: 1; min-width: 140px;">
+            <label class="label" for="filter-from">From</label>
+            <input type="date" id="filter-from" />
+          </div>
+          <div class="field" style="margin: 0; flex: 1; min-width: 140px;">
+            <label class="label" for="filter-to">To</label>
+            <input type="date" id="filter-to" />
           </div>
           <div class="field" style="margin: 0; flex: 2; min-width: 180px;">
             <label class="label" for="filter-q">Search</label>
@@ -51,6 +55,7 @@
             <button type="button" id="export-btn">Export CSV</button>
           </div>
         </div>
+        <p class="muted" style="margin-top: -0.5rem;">Attendance is retained for at least 2 years. Use date range to review history.</p>
         <div class="table-wrap">
           <table>
             <thead>
@@ -73,22 +78,30 @@
   <script src="/app.js"></script>
   <script>
     (() => {
-      const { api, $, escapeHtml, requireStaffPin, toast } = Kumon;
+      const { api, $, escapeHtml, requireStaffPin, toast, downloadWithAuth } = Kumon;
+
+      function filterParams() {
+        const from = $("#filter-from").value;
+        const to = $("#filter-to").value;
+        const q = $("#filter-q").value.trim();
+        const params = new URLSearchParams();
+        if (from) params.set("from", from);
+        if (to) params.set("to", to);
+        if (q) params.set("q", q);
+        params.set("limit", "10000");
+        return params;
+      }
 
       async function boot() {
         await requireStaffPin();
-        const today = new Date();
-        $("#filter-date").value = today.toISOString().slice(0, 10);
+        const today = new Date().toISOString().slice(0, 10);
+        $("#filter-from").value = today;
+        $("#filter-to").value = today;
         await loadLogs();
       }
 
       async function loadLogs() {
-        const date = $("#filter-date").value;
-        const q = $("#filter-q").value.trim();
-        const params = new URLSearchParams();
-        if (date) params.set("date", date);
-        if (q) params.set("q", q);
-        const data = await api("/api/logs?" + params.toString());
+        const data = await api("/api/logs?" + filterParams().toString());
         const logs = data.logs || [];
         $("#logs-empty").style.display = logs.length ? "none" : "block";
         $("#logs-body").innerHTML = logs
@@ -114,19 +127,21 @@
       }
 
       $("#refresh-btn").addEventListener("click", () => loadLogs().catch((e) => toast(e.message)));
-      $("#filter-date").addEventListener("change", () => loadLogs().catch((e) => toast(e.message)));
+      $("#filter-from").addEventListener("change", () => loadLogs().catch((e) => toast(e.message)));
+      $("#filter-to").addEventListener("change", () => loadLogs().catch((e) => toast(e.message)));
       let t;
       $("#filter-q").addEventListener("input", () => {
         clearTimeout(t);
         t = setTimeout(() => loadLogs().catch((e) => toast(e.message)), 250);
       });
       $("#export-btn").addEventListener("click", () => {
-        const date = $("#filter-date").value;
-        const q = $("#filter-q").value.trim();
-        const params = new URLSearchParams();
-        if (date) params.set("date", date);
-        if (q) params.set("q", q);
-        window.location.href = "/api/export/csv?" + params.toString();
+        const params = filterParams();
+        const from = $("#filter-from").value || "start";
+        const to = $("#filter-to").value || "end";
+        downloadWithAuth(
+          "/api/export/csv?" + params.toString(),
+          `attendance-${from}_to_${to}.csv`
+        ).catch((e) => toast(e.message));
       });
 
       boot().catch((err) => toast(err.message));

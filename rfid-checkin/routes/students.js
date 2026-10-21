@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   listStudents,
+  listDirectoryStudents,
   getStudentById,
   createStudent,
   updateStudent,
@@ -10,6 +11,7 @@ const {
   clearTag,
   normalizeTagUid,
 } = require("../db");
+const { requireStaff } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -27,17 +29,22 @@ function normalizeSubjects(input) {
     .filter(Boolean);
 }
 
-router.get("/", (req, res) => {
+/** Public desk directory — name + ID only (no parent PII / raw tag UID). */
+router.get("/directory", (_req, res) => {
+  res.json({ students: listDirectoryStudents() });
+});
+
+router.get("/", requireStaff, (req, res) => {
   const q = String(req.query.q || "").trim();
   const includeInactive = req.query.includeInactive !== "false";
   res.json({ students: listStudents({ q, includeInactive }) });
 });
 
-router.get("/next-code", (_req, res) => {
+router.get("/next-code", requireStaff, (_req, res) => {
   res.json({ studentCode: nextStudentCode() });
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", requireStaff, (req, res) => {
   const student = getStudentById(Number(req.params.id));
   if (!student) {
     return res.status(404).json({ error: "Student not found" });
@@ -45,7 +52,7 @@ router.get("/:id", (req, res) => {
   res.json({ student });
 });
 
-router.post("/", (req, res) => {
+router.post("/", requireStaff, (req, res) => {
   try {
     const body = req.body || {};
     const student = createStudent({
@@ -63,7 +70,7 @@ router.post("/", (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", requireStaff, (req, res) => {
   try {
     const body = req.body || {};
     const fields = { ...body };
@@ -80,14 +87,16 @@ router.put("/:id", (req, res) => {
   }
 });
 
-router.post("/:id/assign-tag", (req, res) => {
+router.post("/:id/assign-tag", requireStaff, (req, res) => {
   try {
     const tagUid = req.body?.tagUid || req.body?.code;
     const force = Boolean(req.body?.force || req.body?.reassign);
     const { student, previousOwner } = assignTag(Number(req.params.id), tagUid, { force });
     res.json({
       student,
-      previousOwner,
+      previousOwner: previousOwner
+        ? { id: previousOwner.id, name: previousOwner.name, studentCode: previousOwner.studentCode }
+        : null,
       message: previousOwner
         ? `Tag moved from ${previousOwner.name} → ${student.name}`
         : `Tag linked to ${student.name}`,
@@ -95,12 +104,18 @@ router.post("/:id/assign-tag", (req, res) => {
   } catch (err) {
     res.status(err.status || 500).json({
       error: err.message || "Failed to assign tag",
-      previousOwner: err.previousOwner || undefined,
+      previousOwner: err.previousOwner
+        ? {
+            id: err.previousOwner.id,
+            name: err.previousOwner.name,
+            studentCode: err.previousOwner.studentCode,
+          }
+        : undefined,
     });
   }
 });
 
-router.delete("/:id/tag", (req, res) => {
+router.delete("/:id/tag", requireStaff, (req, res) => {
   try {
     const student = clearTag(Number(req.params.id));
     res.json({ student, message: "Tag unlinked" });
@@ -109,12 +124,15 @@ router.delete("/:id/tag", (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", requireStaff, (req, res) => {
   const ok = deleteStudent(Number(req.params.id));
   if (!ok) {
     return res.status(404).json({ error: "Student not found" });
   }
-  res.json({ ok: true });
+  res.json({
+    ok: true,
+    message: "Student deactivated and tag freed. Attendance history is kept for at least 2 years.",
+  });
 });
 
 module.exports = router;

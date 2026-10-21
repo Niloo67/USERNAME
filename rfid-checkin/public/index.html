@@ -205,16 +205,10 @@
               : result.email?.status === "failed"
                 ? `Email failed: ${result.email.detail}`
                 : result.email?.detail || "";
-          const contact = [
-            result.student.parentEmail ? result.student.parentEmail : "",
-            result.student.parentPhone ? `Phone ${result.student.parentPhone}` : "",
-          ]
-            .filter(Boolean)
-            .join(" · ");
           showFeedback(
             result.action === "check_in" ? "ok" : "out",
             result.message,
-            [contact, emailNote].filter(Boolean).join(" · ")
+            emailNote
           );
           toast(result.message);
           await refreshActive();
@@ -253,7 +247,7 @@
       });
 
       async function loadRoster() {
-        const data = await api("/api/students?includeInactive=false");
+        const data = await api("/api/students/directory");
         rosterCache = data.students || [];
       }
 
