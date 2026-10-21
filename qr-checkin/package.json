@@ -1,7 +1,7 @@
 {
-  "name": "kumon-checkin",
+  "name": "kumon-qr-checkin",
   "version": "1.0.0",
-  "description": "Scanner-first check-in / check-out for a Kumon learning centre",
+  "description": "QR / barcode scanner check-in for a Kumon learning centre",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

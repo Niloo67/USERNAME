@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings · Kumon Check-In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">Settings<span>Centre name · parent emails</span></div>
+      <nav class="nav">
+        <a href="/">Tap</a>
+        <a href="/roster.html">Roster</a>
+        <a href="/logs.html">Logs</a>
+        <a href="/settings.html" class="active">Settings</a>
+      </nav>
+    </header>
+
+    <section id="pin-gate" class="panel pin-gate">
+      <h2>Staff PIN</h2>
+      <p class="muted">Enter the staff PIN to change settings.</p>
+      <form>
+        <div class="field">
+          <label class="label" for="pin">PIN</label>
+          <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="one-time-code" required />
+        </div>
+        <button type="submit">Unlock</button>
+        <p class="pin-error" style="color: var(--error); margin-top: 0.75rem;"></p>
+      </form>
+    </section>
+
+    <div id="staff-content" hidden>
+      <section class="panel">
+        <h2>Centre</h2>
+        <form id="settings-form">
+          <div class="field">
+            <label class="label" for="centre-name">Centre name</label>
+            <input id="centre-name" required />
+          </div>
+          <h3 style="margin-top: 1.25rem;">Parent email alerts</h3>
+          <p class="muted" id="smtp-status">Checking SMTP…</p>
+          <div class="field">
+            <label class="checkbox-row">
+              <input type="checkbox" id="email-on-checkin" />
+              Email parent on check-in
+            </label>
+          </div>
+          <div class="field">
+            <label class="checkbox-row">
+              <input type="checkbox" id="email-on-checkout" />
+              Email parent on check-out
+            </label>
+          </div>
+          <button type="submit">Save settings</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>How to run this centre (RFID)</h2>
+        <ol class="muted" style="line-height: 1.6;">
+          <li>Keep this app running on the desk laptop (<code>npm start</code> in <code>rfid-checkin</code>).</li>
+          <li>Use a USB <strong>125 kHz RFID reader</strong> in keyboard mode + matching EM4100 tags.</li>
+          <li>Roster: add student + parent email → Select → tap tag → Link (tape tag to folder).</li>
+          <li>When a student leaves: Unlink or Reassign that tag to someone new.</li>
+          <li>SMTP in <code>.env</code> sends parent email on check-in and check-out.</li>
+          <li>Backup: copy <code>data/kumon-rfid.sqlite</code> or export CSV from Logs.</li>
+        </ol>
+      </section>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    (() => {
+      const { api, $, requireStaffPin, toast, playTone } = Kumon;
+
+      async function boot() {
+        await requireStaffPin();
+        const s = await api("/api/settings");
+        $("#centre-name").value = s.centreName || "";
+        $("#email-on-checkin").checked = !!s.emailOnCheckin;
+        $("#email-on-checkout").checked = !!s.emailOnCheckout;
+        $("#smtp-status").textContent = s.smtpConfigured
+          ? "SMTP is configured — emails can send."
+          : "SMTP is not configured yet. Fill SMTP_* values in .env, then restart the server. Check-in still works without email.";
+      }
+
+      $("#settings-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        try {
+          await api("/api/settings", {
+            method: "PUT",
+            body: JSON.stringify({
+              centreName: $("#centre-name").value.trim(),
+              emailOnCheckin: $("#email-on-checkin").checked,
+              emailOnCheckout: $("#email-on-checkout").checked,
+            }),
+          });
+          playTone("in");
+          toast("Settings saved");
+        } catch (err) {
+          playTone("error");
+          toast(err.message);
+        }
+      });
+
+      boot().catch((err) => toast(err.message));
+    })();
+  </script>
+</body>
+</html>

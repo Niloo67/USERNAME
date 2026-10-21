@@ -1,81 +1,91 @@
-# Kumon Check-In / Check-Out
+# Kumon Check-In — two separate apps
 
-**Scanner-first** attendance for a Kumon learning centre. Each student gets a **QR badge**. A USB/Bluetooth **2D desk scanner** reads the badge and checks them in or out. Phones on the centre Wi‑Fi share the same live list. Parent alerts go by **email** (not SMS).
+You can try either system. They are **independent** folders with their own database.
 
-## How check-in works (hardware)
-
-```
-Student QR badge  →  2D desk scanner  →  types student ID + Enter  →  browser checks in/out
-```
-
-You do **not** type IDs at the desk. The scanner acts as a keyboard:
-
-1. Add the student in **Roster** (ID like `K-0001`).
-2. Click **Badge** → **Print badge** and tape the QR to their folder.
-3. Leave the **Scan** page open on the desk computer with the green “Waiting for desk scanner…” banner.
-4. Student presents the badge → pull the scanner trigger → done.
-
-| | USB / Bluetooth **2D QR** scanner | Phone camera |
-| --- | --- | --- |
-| Role | **Primary** at the front desk | Backup only |
-| Speed | Near-instant | Focus + decode lag |
-| Best for | Peak arrivals / pickup | Roaming or overflow |
-
-### What to buy
-
-Must be a **2D imager** that reads **QR codes**, in **USB HID / keyboard** mode (types like a keyboard). Do **not** buy a cheap 1D laser-only scanner — those cannot read QR badges.
-
-| Priority | Model | Notes | Approx. price |
+| Folder | Method | Port | Hardware |
 | --- | --- | --- | --- |
-| **Best default** | **Zebra DS2208** (corded USB) | Plug-and-play HID keyboard; widely used for web check-in; optional stand for hands-free | ~$100–180 |
-| Strong alternative | Honeywell Voyager XP **1470g** (2D SKU) | Durable 2D; confirm the listing says 2D/QR, not 1D-only | ~$120–200 |
-| Hands-free desk | Zebra **DS9308** presentation scanner | Sits on the counter; student holds badge under it | ~$200–300 |
-| Budget | Any Amazon “2D QR USB barcode scanner” with HID keyboard mode (e.g. Tera / Symcode class) | Fine for a small centre; test with Notepad before relying on it | ~$40–80 |
+| [`qr-checkin/`](qr-checkin/) | Printed **QR** badges + USB **2D** scanner | `3000` | ~$20–40 scanner |
+| [`rfid-checkin/`](rfid-checkin/) | **RFID tags** on folders + USB tap reader | `3001` | ~$12–30 reader + tag pack |
 
-**Avoid:** “1D only”, “laser barcode scanner” without 2D/QR, and scanners that only work in serial/COM mode (need drivers).
+Run **only one** on the desk laptop at a time (or both on different ports if you are comparing).
 
-**Setup tip:** After plugging in USB, open Notepad and scan a printed student badge. You should see something like `K-0001` appear, usually ending with Enter. If Notepad works, this app will work. If Enter is missing, scan the manufacturer’s “suffix CR/Enter” programming barcode from the manual.
+---
 
-### Manual backup (already in the app)
+## Which should you buy?
 
-If the scanner fails or a badge is damaged:
+### Option A — QR (print badges)
 
-1. Open **Backup options** on the Scan page  
-2. Search by student name, or type the ID printed under the QR  
-3. Or use **Phone camera** / **Scan badge image**  
+- Cheapest long-term (reprint stickers for free)  
+- Phone camera can be a backup  
+- Buy: **USB 2D QR scanner** (Tera / NetumScan / Eyoyo class, ~$20–40)  
+- Details: [qr-checkin/README.md](qr-checkin/README.md)
 
-So the desk can keep running even without the hardware scanner.
+### Option B — RFID tags (tap)
 
-## Quick start
+- Feels nicer for kids (tap folder on pad)  
+- Buy matching **125 kHz USB keyboard reader** + **EM4100 tags/fobs**  
+- Reassign tags when a student leaves  
+- Details: [rfid-checkin/README.md](rfid-checkin/README.md)
 
-```bash
-cp .env.example .env
+**Quick RFID shopping list**
+
+1. `USB RFID reader 125kHz keyboard emulation` — ~$12–30  
+2. `EM4100 RFID key fobs 50 pack` (or sticker tags) — ~$10–20  
+3. Confirm both say **125 kHz** / **EM4100**  
+4. Test in **Notepad** on the laptop before relying on it  
+
+---
+
+## Move from Mac → Windows laptop
+
+Yes — copy the project folder (USB drive, zip, git clone, etc.). Then on Windows:
+
+1. Install [Node.js LTS](https://nodejs.org/)  
+2. Install Chrome or Edge  
+3. Open PowerShell in the app folder you chose:
+
+```powershell
+cd qr-checkin
+copy .env.example .env
 npm install
 npm start
 ```
 
-Open `http://localhost:3000` on the desk PC. On other devices: `http://<desk-pc-ip>:3000`.
+or
 
-### `.env` essentials
+```powershell
+cd rfid-checkin
+copy .env.example .env
+npm install
+npm start
+```
 
-- `STAFF_PIN` — unlocks Roster, Logs, and Settings
-- `CENTRE_NAME` — shown on badges and emails
-- `SMTP_*` — optional; without them, check-in still works and parent email is skipped
+4. Open `http://localhost:3000` (QR) or `http://localhost:3001` (RFID)  
+5. Plug in scanner/reader → test in Notepad first  
+6. Power settings: **never sleep** when plugged in  
 
-**Gmail:** enable 2-Step Verification → create an App Password → set `SMTP_USER` and `SMTP_PASS`.
+**Do not copy `node_modules`** from Mac — run `npm install` on Windows (native modules differ).  
+**Do copy** `.env` if you already filled SMTP settings, or recreate from `.env.example`.
 
-## Daily use
+---
 
-1. Start the app on the desk computer; leave **Scan** open (scanner target stays focused).
-2. Plug in the 2D scanner.
-3. Modes: **Auto** (toggles in/out), **Force Check-In**, **Force Check-Out**.
-4. Backups: **Manual / camera backup** on the Scan page (search by name, type ID, phone camera, or badge photo). **Simulate desk scan** mimics a USB scanner when you have no hardware yet.
-5. Export history from **Logs**.
+## Parent emails (both apps)
 
-## Backup
+In `.env` inside the folder you run:
 
-Copy `data/kumon.sqlite`, or export CSV from Logs.
+```
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your@gmail.com
+SMTP_PASS=your_app_password
+EMAIL_ON_CHECKIN=true
+EMAIL_ON_CHECKOUT=true
+```
 
-## Stack
+Gmail: enable 2-Step Verification → create an App Password.
 
-Node.js, Express, SQLite (`better-sqlite3`), Nodemailer, static HTML + Tailwind CDN + Vanilla JS. No React build step.
+---
+
+## Staff PIN
+
+Default in `.env.example` is `1234`. Change `STAFF_PIN` before using with real families.

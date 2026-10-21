@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Logs · Kumon Check-In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">Attendance Logs<span>History · CSV export</span></div>
+      <nav class="nav">
+        <a href="/">Tap</a>
+        <a href="/roster.html">Roster</a>
+        <a href="/logs.html" class="active">Logs</a>
+        <a href="/settings.html">Settings</a>
+      </nav>
+    </header>
+
+    <section id="pin-gate" class="panel pin-gate">
+      <h2>Staff PIN</h2>
+      <p class="muted">Enter the staff PIN to view logs.</p>
+      <form>
+        <div class="field">
+          <label class="label" for="pin">PIN</label>
+          <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="one-time-code" required />
+        </div>
+        <button type="submit">Unlock</button>
+        <p class="pin-error" style="color: var(--error); margin-top: 0.75rem;"></p>
+      </form>
+    </section>
+
+    <div id="staff-content" hidden>
+      <section class="panel">
+        <div class="row" style="margin-bottom: 1rem;">
+          <div class="field" style="margin: 0; flex: 1; min-width: 160px;">
+            <label class="label" for="filter-date">Date</label>
+            <input type="date" id="filter-date" />
+          </div>
+          <div class="field" style="margin: 0; flex: 2; min-width: 180px;">
+            <label class="label" for="filter-q">Search</label>
+            <input id="filter-q" placeholder="Name or student ID" />
+          </div>
+          <div class="row" style="align-self: end;">
+            <button type="button" id="refresh-btn" class="secondary">Refresh</button>
+            <button type="button" id="export-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Student</th>
+                <th>Action</th>
+                <th>Mode</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody id="logs-body"></tbody>
+          </table>
+        </div>
+        <p id="logs-empty" class="muted">No log entries for this filter.</p>
+      </section>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    (() => {
+      const { api, $, escapeHtml, requireStaffPin, toast } = Kumon;
+
+      async function boot() {
+        await requireStaffPin();
+        const today = new Date();
+        $("#filter-date").value = today.toISOString().slice(0, 10);
+        await loadLogs();
+      }
+
+      async function loadLogs() {
+        const date = $("#filter-date").value;
+        const q = $("#filter-q").value.trim();
+        const params = new URLSearchParams();
+        if (date) params.set("date", date);
+        if (q) params.set("q", q);
+        const data = await api("/api/logs?" + params.toString());
+        const logs = data.logs || [];
+        $("#logs-empty").style.display = logs.length ? "none" : "block";
+        $("#logs-body").innerHTML = logs
+          .map(
+            (log) => `
+          <tr>
+            <td>${escapeHtml(log.timestamp)}</td>
+            <td>
+              <strong>${escapeHtml(log.studentName)}</strong>
+              <div class="muted">${escapeHtml(log.studentCode)}</div>
+            </td>
+            <td><span class="badge ${log.action === "check_in" ? "in" : "out"}">${
+              log.action === "check_in" ? "Check in" : "Check out"
+            }</span></td>
+            <td>${escapeHtml(log.mode)}</td>
+            <td>
+              <div>${escapeHtml(log.emailStatus)}</div>
+              <div class="muted">${escapeHtml(log.emailDetail || "")}</div>
+            </td>
+          </tr>`
+          )
+          .join("");
+      }
+
+      $("#refresh-btn").addEventListener("click", () => loadLogs().catch((e) => toast(e.message)));
+      $("#filter-date").addEventListener("change", () => loadLogs().catch((e) => toast(e.message)));
+      let t;
+      $("#filter-q").addEventListener("input", () => {
+        clearTimeout(t);
+        t = setTimeout(() => loadLogs().catch((e) => toast(e.message)), 250);
+      });
+      $("#export-btn").addEventListener("click", () => {
+        const date = $("#filter-date").value;
+        const q = $("#filter-q").value.trim();
+        const params = new URLSearchParams();
+        if (date) params.set("date", date);
+        if (q) params.set("q", q);
+        window.location.href = "/api/export/csv?" + params.toString();
+      });
+
+      boot().catch((err) => toast(err.message));
+    })();
+  </script>
+</body>
+</html>
