@@ -8,23 +8,27 @@ Uses Google Trends / multi-source trends, X (Twitter) mention sentiment, market 
 
 ## Start here
 
-1. **[`HYBRID.md`](HYBRID.md)** — **active delivery** (Wed/Fri digests in chat + repo; dashboard later)  
-2. **[`knowledge-base/00-executive-research-brief.md`](knowledge-base/00-executive-research-brief.md)** — best setup, websites, who to follow  
-3. **[`knowledge-base/`](knowledge-base/README.md)** — full doctrine + 30-day curriculum  
-4. **[`SETUP.md`](SETUP.md)** — optional later: Automations + email keys  
-5. **`.cursor/skills/portfolio-digest/`** — what the agent does each run  
+1. **[`WEEKLY-WORKFLOW.md`](WEEKLY-WORKFLOW.md)** — **agentic weekly system** (Sun / Wed / Fri decision loop)  
+2. **[`HYBRID.md`](HYBRID.md)** — delivery timers + chat/`digests/` archive  
+3. **[`knowledge-base/07-weekly-decision-framework.md`](knowledge-base/07-weekly-decision-framework.md)** — buy/hold/skip rules  
+4. **[`knowledge-base/`](knowledge-base/README.md)** — full doctrine + 30-day curriculum  
+5. **[`SETUP.md`](SETUP.md)** — optional later: Automations + email keys  
+6. **`.cursor/skills/portfolio-digest/`** — what the agent does each run  
 
 ## What’s in this repo
 
 | Path | Purpose |
 |------|---------|
+| `WEEKLY-WORKFLOW.md` | Human + agent map for weekly decisions |
 | `HYBRID.md` | Option C delivery plan + timer UTC map |
+| `automations/weekly-decision-agent.md` | Master agentic pipeline prompt |
+| `automations/hybrid-timer-prompt.md` | Sun/Wed/Fri timer prompt copy |
 | `docs/fix-trends-mcp-cloud.md` | If digests say Trends auth failed — fix Cloud Agent API key |
-| `knowledge-base/` | Research brief, sources, educators, signals, architecture, 30-day curriculum |
-| `.cursor/skills/portfolio-digest/` | Agent skill: scoring, sleeves, email template |
-| `automations/weekly-portfolio-digest.md` | Ready-to-paste Cursor Automation config |
+| `knowledge-base/` | Research brief, sources, signals, architecture, decision framework |
+| `.cursor/skills/portfolio-digest/` | Agent skill: scoring, sleeves, formats |
+| `automations/weekly-portfolio-digest.md` | Later: Cursor Automation + email config |
 | `.cursor/mcp.json.example` | Example MCP wiring (Trends, X/Grok, market data, Resend) |
-| `digests/` | Saved digest archive (sample included) |
+| `digests/` | Saved digest archive + `_templates/` |
 
 ## Recommended stack
 

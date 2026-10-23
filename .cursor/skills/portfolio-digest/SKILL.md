@@ -11,11 +11,14 @@ Research what looks attractive to buy or hold for a **growth-balanced** investor
 
 Before scoring ideas, read and follow:
 
+- `WEEKLY-WORKFLOW.md` — agentic weekly loop + human checklist
+- `knowledge-base/07-weekly-decision-framework.md` — buy/hold/skip rules + size caps
 - `knowledge-base/00-executive-research-brief.md` — setup + source priorities
 - `knowledge-base/04-signal-philosophy.md` — Trends/X are attention sensors, not buy signals
 - `knowledge-base/02-data-sources.md` — Tier 1–2 for facts; Tier 3 for attention
 - `knowledge-base/05-architecture.md` — locked allocation policy
 - `knowledge-base/03-people-to-follow.md` — evidence-based framing (Felix / Bogleheads / Damodaran)
+- `automations/weekly-decision-agent.md` — full pipeline when running scheduled/on-demand
 
 If paths differ (no-repo automation), apply the same hierarchy from memory: **allocation → regime → fundamentals → price → Trends/X**.
 
@@ -26,6 +29,7 @@ If paths differ (no-repo automation), apply the same hierarchy from memory: **al
 - Prefer liquid ETFs + quality large/mid-caps; avoid leverage, penny stocks, and pure hype
 - Single-name satellite sleeve capped at ~20–25% of equities
 - Not personalized financial advice; label ideas as research hypotheses
+- Default digests are **generic**. Only load `portfolio/` (TFSA / RRSP holdings) when she asks about an account; write personalized notes as `digests/*-tfsa-*.md` or `*-rrsp-*.md`, never rewrite the generic buy report into a personal one, and never mix accounts
 
 ## Data gathering order
 
@@ -88,12 +92,19 @@ Fuller wrap:
 1. Week in markets
 2. What trends/social got right vs wrong
 3. Updated balanced portfolio actions (buy / hold / trim)
-4. Watchlist for next week
-5. Memory update: what to track next run
+4. **Explained shopping list** (what / why / how much / bear case) — required Friday
+5. World-theme scan (oil, AI hardware, AI power, copper, defense)
+6. Watchlist for next week
+7. Learning tags vs prior week when possible
+
+### Sunday week-ahead (optional third timer)
+
+Calendar + themes to watch + tentative leans — see `automations/weekly-decision-agent.md`.
 
 ## Output format (keep it easy to read)
 
 Write for a busy human. Short sentences. Few tables. No jargon unless you explain it in plain words.
+**Friday exception:** after the short tables, add a longer explained shopping list — Niloo finds tables-alone too thin.
 
 ```text
 # Midweek check-in — Mon DD, YYYY
