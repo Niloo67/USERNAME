@@ -1,5 +1,7 @@
 # Kumon NDG – Check-In / Check-Out — two separate apps
 
+**Staff user manual (RFID desk app):** [USER_MANUAL.md](USER_MANUAL.md)
+
 You can try either system. They are **independent** folders with their own database.
 
 | Folder | Method | Port | Hardware |

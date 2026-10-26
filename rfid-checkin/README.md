@@ -2,6 +2,8 @@
 
 USB **RFID/NFC reader** + tags on student folders. Tap to check in/out. Parent email on both events.
 
+**How to use the app day-to-day:** see the [User Manual](../USER_MANUAL.md).
+
 ## Run
 
 ```bash
