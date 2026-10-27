@@ -205,18 +205,26 @@ SMTP must be configured for emailing (same as parent emails).
 
 ---
 
-## 9. Settings & weekly backup
+## 9. Settings & automatic cloud backup
 
-1. Open **Settings** → Staff PIN  
-2. You can change the centre name (used on emails)  
-3. Turn parent email alerts on/off  
-4. Click **Create backup now**  
+Attendance is **saved automatically** every time someone checks in or out (on the laptop).
 
-**Every week:**
+### Automatic daily backup (so nobody forgets)
 
-1. Create a backup in Settings  
-2. Copy the folder `rfid-checkin\data\backups\` to a **USB drive** or cloud folder  
-3. Keep those copies for **at least 2 years**
+1. On the Windows laptop, install **OneDrive** or **Google Drive**  
+2. Create a folder such as `OneDrive\Kumon-backups`  
+3. Open **Settings** → Staff PIN  
+4. Paste that folder’s full path into **Cloud backup folder**  
+   Example: `C:\Users\YourName\OneDrive\Kumon-backups`  
+5. Leave **Automatic daily backup** checked → **Save backup settings**  
+
+While `npm start` is running, the app makes a backup **once per day** into:
+- `rfid-checkin\data\backups\` (local), and  
+- your OneDrive/Google Drive folder (cloud sync)
+
+You can still click **Create backup now** anytime.
+
+Keep cloud copies for **at least 2 years**.
 
 ---
 
@@ -294,7 +302,7 @@ Reader and tags stay the same.
 
 **Accountant:** Settings → accountant email → Email last week’s staff report  
 
-**Weekly backup:** Settings → Create backup → copy `data\backups` to USB  
+**Cloud backup:** Settings → set OneDrive/Google Drive path → auto daily backup runs while the app is open  
 
 ---
 

@@ -9,8 +9,9 @@ const settingsRouter = require("./routes/settings");
 const backupRouter = require("./routes/backup");
 const reportsRouter = require("./routes/reports");
 const { usingDefaultPin, staffPinConfigured } = require("./middleware/auth");
-const { listStaffLogs, getWeekRange, getSetting, setSetting } = require("./db");
+const { listStaffLogs, getWeekRange, getSetting, setSetting, dataDir, dbPath } = require("./db");
 const { sendStaffWeekReport } = require("./services/email");
+const { maybeAutoBackup } = require("./services/backup");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -55,12 +56,30 @@ async function maybeSendWeeklyStaffReport() {
   }
 }
 
+function runAutoBackup() {
+  try {
+    const outcome = maybeAutoBackup({ dataDir, dbPath, label: "kumon-rfid" });
+    if (outcome.ran) {
+      const cloud = outcome.result?.cloudCopied
+        ? ` + cloud ${outcome.result.cloudDir}`
+        : outcome.result?.cloudDir
+          ? ` (cloud copy failed: ${outcome.result.cloudError})`
+          : "";
+      console.log(`Auto backup saved (${outcome.result.logCount} logs)${cloud}`);
+    }
+  } catch (err) {
+    console.warn("Auto backup failed:", err.message);
+  }
+}
+
 setInterval(() => {
   maybeSendWeeklyStaffReport().catch((err) => console.warn(err.message));
+  runAutoBackup();
 }, 60 * 60 * 1000);
 setTimeout(() => {
   maybeSendWeeklyStaffReport().catch(() => {});
-}, 15_000);
+  runAutoBackup();
+}, 20_000);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

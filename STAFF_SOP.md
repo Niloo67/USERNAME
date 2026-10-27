@@ -30,11 +30,11 @@ Roster, Logs, and Settings require the **Staff PIN** (set `STAFF_PIN` in `.env` 
 1. Confirm everyone who left is checked out (Who is here should match reality).
 2. Optionally create a backup from Settings before shutdown.
 
-## Weekly backup (requirement 6 & 8)
+## Automatic backup (requirement 6 & 8)
 
-1. Settings → **Create backup now**.
-2. Copy the entire `data/backups/` folder to a USB drive or cloud folder.
-3. Keep those copies for **at least 2 years**.
+1. Set **Cloud backup folder** in Settings to a OneDrive/Google Drive path (once).
+2. Keep the app running during centre hours — a backup runs **automatically once per day** to local + cloud.
+3. Keep cloud copies for **at least 2 years**.
 4. Do not delete `data/*.sqlite` or old backup files until they are older than 2 years **and** you have another copy.
 
 ## If the laptop or app is down

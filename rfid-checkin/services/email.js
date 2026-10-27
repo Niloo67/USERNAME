@@ -133,9 +133,6 @@ function staffLogsToCsv(logs) {
  * Email accountant a CSV of staff punches for a week.
  * @returns {{ status: 'sent'|'skipped'|'failed', detail: string, from?: string, to?: string, count?: number }}
  */
-const DEFAULT_STAFF_REPORT_EMAILS =
-  "Nassershayan@gmail.com, montreal-ndg@ikumon.com";
-
 function parseEmailList(raw) {
   return String(raw || "")
     .split(/[,;]+/)

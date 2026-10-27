@@ -94,6 +94,8 @@ function ensureDefaultSettings() {
       process.env.ACCOUNTANT_EMAIL ||
       "Nassershayan@gmail.com, montreal-ndg@ikumon.com",
     staff_report_auto_weekly: process.env.STAFF_REPORT_AUTO_WEEKLY === "true" ? "true" : "false",
+    backup_cloud_folder: process.env.BACKUP_CLOUD_FOLDER || "",
+    auto_backup_daily: process.env.AUTO_BACKUP_DAILY !== "false" ? "true" : "false",
   };
   for (const [key, value] of Object.entries(defaults)) {
     if (getSetting(key) === null) {

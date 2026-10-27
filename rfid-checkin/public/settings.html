@@ -87,14 +87,34 @@
       <section class="panel">
         <h2>Backup &amp; 2-year retention</h2>
         <p class="muted" id="compliance-status">Loading…</p>
+        <p class="muted">
+          Attendance is saved automatically all day on this laptop.
+          The app also makes a <strong>daily backup copy</strong> (while it is running).
+          Point the folder below at <strong>OneDrive</strong> or <strong>Google Drive</strong> so copies sync to the cloud without USB.
+        </p>
+        <div class="field" style="margin-top: 0.85rem;">
+          <label class="label" for="backup-cloud-folder">Cloud backup folder (OneDrive / Google Drive path)</label>
+          <input
+            id="backup-cloud-folder"
+            type="text"
+            placeholder="C:\Users\YourName\OneDrive\Kumon-backups"
+          />
+          <p class="muted" style="margin-top: 0.35rem;">
+            Example: create a folder <code>Kumon-backups</code> inside OneDrive, then paste that full path here.
+          </p>
+        </div>
+        <div class="field">
+          <label class="checkbox-row">
+            <input type="checkbox" id="auto-backup-daily" checked />
+            Automatic daily backup (local + cloud folder if set)
+          </label>
+        </div>
         <div class="row" style="margin-top: 1rem;">
           <button type="button" id="backup-btn">Create backup now</button>
           <button type="button" id="refresh-compliance" class="secondary">Refresh status</button>
+          <button type="button" id="save-backup-settings" class="secondary">Save backup settings</button>
         </div>
-        <p class="muted" style="margin-top: 0.75rem;">
-          Backups are saved under <code>data/backups/</code> on this computer.
-          Copy that folder to a USB drive or cloud <strong>weekly</strong>. Keep backups for at least <strong>2 years</strong>.
-        </p>
+        <p class="muted" id="backup-cloud-status" style="margin-top: 0.75rem;"></p>
         <ul id="backup-list" class="muted" style="margin-top: 0.75rem; line-height: 1.6;"></ul>
       </section>
 
@@ -106,7 +126,7 @@
           <li><strong>Actual arrival/departure</strong> — Scan/tap at the desk when the student arrives and leaves (do not backfill later).</li>
           <li><strong>Staff oversight</strong> — Train staff using the SOP below; use the Staff PIN for roster, logs, and settings.</li>
           <li><strong>Who is here + history</strong> — Desk “Who is here” list; Logs page for historical review/export.</li>
-          <li><strong>Backup</strong> — Use “Create backup now” and copy <code>data/backups/</code> off this laptop weekly. Paper sign-in only if the laptop is down.</li>
+          <li><strong>Backup</strong> — Data saves live; daily auto-backup to local + OneDrive/Google Drive folder. Paper sign-in only if the laptop is down.</li>
           <li><strong>PII</strong> — Parent contact is PIN-protected; desk scan screen does not show parent phone/email.</li>
           <li><strong>Retain ≥ 2 years</strong> — Logs are never auto-deleted; keep database + backup copies for at least two years.</li>
         </ol>
@@ -178,8 +198,23 @@
         $("#staff-report-status").textContent = s.lastStaffReportSent
           ? `Last staff report emailed: ${s.lastStaffReportSent}`
           : "No staff report emailed yet. Mark people as Staff on Roster, then send.";
+        $("#backup-cloud-folder").value = s.backupCloudFolder || "";
+        $("#auto-backup-daily").checked = s.autoBackupDaily !== false;
+        $("#backup-cloud-status").textContent = s.lastBackupAt
+          ? `Last backup: ${s.lastBackupAt}`
+          : "No backup created yet — will run automatically once per day while the app is open.";
         await loadCompliance();
         await loadStaffPreview();
+      }
+
+      async function saveBackupSettings() {
+        await api("/api/settings", {
+          method: "PUT",
+          body: JSON.stringify({
+            backupCloudFolder: $("#backup-cloud-folder").value.trim(),
+            autoBackupDaily: $("#auto-backup-daily").checked,
+          }),
+        });
       }
 
       async function loadStaffPreview() {
@@ -249,10 +284,28 @@
 
       $("#backup-btn").addEventListener("click", async () => {
         try {
+          await saveBackupSettings();
           const result = await api("/api/backup", { method: "POST", body: "{}" });
           playTone("in");
-          toast(`Backup saved (${result.logCount} log rows)`);
+          const cloudNote = result.cloudCopied
+            ? " · copied to cloud folder"
+            : result.cloudError
+              ? ` · cloud copy failed: ${result.cloudError}`
+              : "";
+          toast(`Backup saved (${result.logCount} log rows)${cloudNote}`);
+          $("#backup-cloud-status").textContent = result.note || "";
           await loadCompliance();
+        } catch (err) {
+          playTone("error");
+          toast(err.message);
+        }
+      });
+
+      $("#save-backup-settings").addEventListener("click", async () => {
+        try {
+          await saveBackupSettings();
+          playTone("in");
+          toast("Backup settings saved");
         } catch (err) {
           playTone("error");
           toast(err.message);

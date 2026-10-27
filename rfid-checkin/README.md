@@ -78,7 +78,7 @@ Set `SMTP_*` in `.env` (Gmail App Password works). Defaults: email on check-in *
 
 1. Set a strong `STAFF_PIN` in `.env`  
 2. Tap tags at **actual** arrival and departure (do not backfill later)  
-3. Weekly: Settings → **Create backup** → copy `data/backups/` to USB/cloud  
+3. Settings → set **Cloud backup folder** to OneDrive/Google Drive → daily auto-backup  
 4. Keep backups and the database for **≥ 2 years**  
 
 Full staff procedure: [STAFF_SOP.md](../STAFF_SOP.md). Checklist is also shown under Settings.

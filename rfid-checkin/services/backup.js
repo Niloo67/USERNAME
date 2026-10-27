@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { db, listLogs, getRetentionInfo } = require("../db");
+const { db, listLogs, getRetentionInfo, getSetting, setSetting } = require("../db");
 
 const RETENTION_YEARS = 2;
 
@@ -45,9 +45,30 @@ function writeCsvArchive(filePath, logs) {
   fs.writeFileSync(filePath, lines.join("\n"), "utf8");
 }
 
+function resolveCloudBackupDir() {
+  const configured = String(
+    getSetting("backup_cloud_folder", process.env.BACKUP_CLOUD_FOLDER || "")
+  ).trim();
+  return configured || null;
+}
+
+function copyIntoCloud(cloudDir, files) {
+  if (!cloudDir) return { copied: false, cloudDir: null, error: null };
+  try {
+    ensureDir(cloudDir);
+    for (const filePath of files) {
+      if (!filePath || !fs.existsSync(filePath)) continue;
+      fs.copyFileSync(filePath, path.join(cloudDir, path.basename(filePath)));
+    }
+    return { copied: true, cloudDir, error: null };
+  } catch (err) {
+    return { copied: false, cloudDir, error: err.message || "Cloud copy failed" };
+  }
+}
+
 /**
- * Copy SQLite DB + write a full CSV snapshot under data/backups/.
- * Attendance logs are never auto-deleted (retain ≥ 2 years).
+ * Copy SQLite DB + CSV under data/backups/, and also into the configured
+ * OneDrive/Google Drive folder when set (so sync happens automatically).
  */
 function createBackup({ dataDir, dbPath, label = "kumon" }) {
   ensureDir(dataDir);
@@ -71,21 +92,33 @@ function createBackup({ dataDir, dbPath, label = "kumon" }) {
   const logs = listLogs({ limit: 100000, from: "", to: "", date: "", q: "" });
   writeCsvArchive(csvDest, logs);
 
-  // Monthly named copy for easy 2-year filing (YYYY-MM)
   const month = new Date().toISOString().slice(0, 7);
   const monthlyCsv = path.join(backupDir, `archive-${month}.csv`);
   if (!fs.existsSync(monthlyCsv)) {
     fs.copyFileSync(csvDest, monthlyCsv);
   }
 
+  const cloudDir = resolveCloudBackupDir();
+  const cloud = copyIntoCloud(cloudDir, [dbDest, csvDest, monthlyCsv]);
+
+  setSetting("last_backup_at", new Date().toISOString());
+  setSetting("last_backup_day", new Date().toISOString().slice(0, 10));
+
   return {
     createdAt: new Date().toISOString(),
     dbFile,
     csvFile,
     backupDir,
+    cloudDir: cloud.cloudDir,
+    cloudCopied: cloud.copied,
+    cloudError: cloud.error,
     logCount: logs.length,
     retentionYears: RETENTION_YEARS,
-    note: "Copy the backups folder to a USB drive or cloud weekly. Keep files for at least 2 years.",
+    note: cloud.copied
+      ? `Backup saved locally and copied to cloud folder: ${cloud.cloudDir}`
+      : cloudDir
+        ? `Local backup saved; cloud copy failed: ${cloud.error}`
+        : "Local backup saved. Set a OneDrive/Google Drive folder in Settings for automatic cloud copies.",
   };
 }
 
@@ -106,6 +139,7 @@ function listBackupFiles(dataDir) {
 function getComplianceStatus(dataDir) {
   const retention = getRetentionInfo();
   const backups = listBackupFiles(dataDir);
+  const cloudDir = resolveCloudBackupDir();
   return {
     retentionYearsRequired: RETENTION_YEARS,
     oldestLog: retention.oldestLog,
@@ -113,14 +147,29 @@ function getComplianceStatus(dataDir) {
     logCount: retention.logCount,
     daysOfHistory: retention.daysOfHistory,
     meetsTwoYearWindow: retention.daysOfHistory == null || retention.daysOfHistory >= 0,
-    // "meets" means we are keeping data and not purging; new centres start at day 0
     autoPurgeDisabled: true,
     backupCount: backups.length,
     latestBackup: backups[0] || null,
     backups,
+    backupCloudFolder: cloudDir || "",
+    autoBackupDaily: getSetting("auto_backup_daily", "true") === "true",
+    lastBackupAt: getSetting("last_backup_at", ""),
     policy:
-      "Attendance logs are append-only and never auto-deleted. Retain and back up for at least 2 years.",
+      "Attendance is saved live on this laptop. Automatic daily backups copy to the local backups folder and (if set) your OneDrive/Google Drive folder.",
   };
+}
+
+/** Run at most once per calendar day while the app is open. */
+function maybeAutoBackup({ dataDir, dbPath, label = "kumon-rfid" }) {
+  if (getSetting("auto_backup_daily", "true") !== "true") {
+    return { ran: false, reason: "disabled" };
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  if (getSetting("last_backup_day", "") === today) {
+    return { ran: false, reason: "already_today" };
+  }
+  const result = createBackup({ dataDir, dbPath, label });
+  return { ran: true, result };
 }
 
 module.exports = {
@@ -129,4 +178,6 @@ module.exports = {
   listBackupFiles,
   getComplianceStatus,
   writeCsvArchive,
+  maybeAutoBackup,
+  resolveCloudBackupDir,
 };
