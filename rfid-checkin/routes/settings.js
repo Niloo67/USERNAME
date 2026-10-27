@@ -1,5 +1,5 @@
 const express = require("express");
-const { getSetting, setSetting } = require("../db");
+const { getSetting, setSetting, dataDir } = require("../db");
 const { getEmailStatus } = require("../services/email");
 const {
   requireStaff,
@@ -8,21 +8,27 @@ const {
   usingDefaultPin,
 } = require("../middleware/auth");
 const { getComplianceStatus } = require("../services/backup");
-const { dataDir } = require("../db");
 
 const router = express.Router();
 
-router.get("/", (_req, res) => {
+function settingsPayload() {
   const email = getEmailStatus();
-  res.json({
+  return {
     centreName: email.centreName,
     emailOnCheckin: email.emailOnCheckin,
     emailOnCheckout: email.emailOnCheckout,
     smtpConfigured: email.smtpConfigured,
+    accountantEmail: email.accountantEmail,
+    staffReportAutoWeekly: email.staffReportAutoWeekly,
+    lastStaffReportSent: email.lastStaffReportSent,
     staffPinConfigured: staffPinConfigured(),
     usingDefaultPin: usingDefaultPin(),
     appTitle: "Kumon NDG – Check-In / Check-Out",
-  });
+  };
+}
+
+router.get("/", (_req, res) => {
+  res.json(settingsPayload());
 });
 
 router.get("/compliance", requireStaff, (_req, res) => {
@@ -40,15 +46,13 @@ router.put("/", requireStaff, (req, res) => {
   if (body.emailOnCheckout !== undefined) {
     setSetting("email_on_checkout", body.emailOnCheckout ? "true" : "false");
   }
-  const email = getEmailStatus();
-  res.json({
-    centreName: email.centreName,
-    emailOnCheckin: email.emailOnCheckin,
-    emailOnCheckout: email.emailOnCheckout,
-    smtpConfigured: email.smtpConfigured,
-    staffPinConfigured: staffPinConfigured(),
-    usingDefaultPin: usingDefaultPin(),
-  });
+  if (body.accountantEmail !== undefined) {
+    setSetting("accountant_email", String(body.accountantEmail || "").trim());
+  }
+  if (body.staffReportAutoWeekly !== undefined) {
+    setSetting("staff_report_auto_weekly", body.staffReportAutoWeekly ? "true" : "false");
+  }
+  res.json(settingsPayload());
 });
 
 router.post("/verify-pin", (req, res) => {

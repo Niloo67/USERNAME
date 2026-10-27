@@ -58,8 +58,23 @@
               Email parent on check-out
             </label>
           </div>
+          <div class="field" style="margin-top: 1.25rem;">
+            <label class="label" for="accountant-email">Accountant email (weekly staff punches)</label>
+            <input id="accountant-email" type="email" placeholder="accountant@example.com" />
+          </div>
+          <div class="field">
+            <label class="checkbox-row">
+              <input type="checkbox" id="staff-report-auto" />
+              Auto-email last week’s staff CSV every Monday (app must be running)
+            </label>
+          </div>
           <button type="submit">Save settings</button>
         </form>
+        <div class="row" style="margin-top: 1rem;">
+          <button type="button" id="send-staff-report">Email last week’s staff report now</button>
+          <button type="button" id="download-staff-report" class="secondary">Download staff CSV</button>
+        </div>
+        <p class="muted" id="staff-report-status" style="margin-top: 0.75rem;"></p>
       </section>
 
       <section class="panel">
@@ -139,6 +154,8 @@
         $("#centre-name").value = s.centreName || "";
         $("#email-on-checkin").checked = !!s.emailOnCheckin;
         $("#email-on-checkout").checked = !!s.emailOnCheckout;
+        $("#accountant-email").value = s.accountantEmail || "";
+        $("#staff-report-auto").checked = !!s.staffReportAutoWeekly;
         $("#smtp-status").textContent = s.smtpConfigured
           ? "SMTP is configured — emails can send."
           : "SMTP is not configured yet. Fill SMTP_* values in .env, then restart the server. Check-in still works without email.";
@@ -151,7 +168,22 @@
         } else {
           $("#pin-status").textContent = "Staff PIN is configured.";
         }
+        $("#staff-report-status").textContent = s.lastStaffReportSent
+          ? `Last staff report emailed: ${s.lastStaffReportSent}`
+          : "No staff report emailed yet. Mark people as Staff on Roster, then send.";
         await loadCompliance();
+        await loadStaffPreview();
+      }
+
+      async function loadStaffPreview() {
+        try {
+          const r = await api("/api/reports/staff-week?week=previous");
+          $("#staff-report-status").textContent =
+            `Last week (${r.from} → ${r.to}): ${r.count} staff punch(es).` +
+            (r.lastStaffReportSent ? ` Last emailed: ${r.lastStaffReportSent}` : "");
+        } catch {
+          /* ignore */
+        }
       }
 
       $("#settings-form").addEventListener("submit", async (e) => {
@@ -163,14 +195,49 @@
               centreName: $("#centre-name").value.trim(),
               emailOnCheckin: $("#email-on-checkin").checked,
               emailOnCheckout: $("#email-on-checkout").checked,
+              accountantEmail: $("#accountant-email").value.trim(),
+              staffReportAutoWeekly: $("#staff-report-auto").checked,
             }),
           });
           playTone("in");
           toast("Settings saved");
+          await loadStaffPreview();
         } catch (err) {
           playTone("error");
           toast(err.message);
         }
+      });
+
+      $("#send-staff-report").addEventListener("click", async () => {
+        try {
+          await api("/api/settings", {
+            method: "PUT",
+            body: JSON.stringify({
+              accountantEmail: $("#accountant-email").value.trim(),
+              staffReportAutoWeekly: $("#staff-report-auto").checked,
+            }),
+          });
+          const result = await api("/api/reports/staff-week/email", {
+            method: "POST",
+            body: JSON.stringify({ week: "previous" }),
+          });
+          playTone("in");
+          toast(`Staff report emailed (${result.count || 0} entries)`);
+          const s = await api("/api/settings");
+          $("#staff-report-status").textContent = s.lastStaffReportSent
+            ? `Last staff report emailed: ${s.lastStaffReportSent} (${result.count || 0} entries)`
+            : `Report sent (${result.count || 0} entries)`;
+        } catch (err) {
+          playTone("error");
+          toast(err.message);
+        }
+      });
+
+      $("#download-staff-report").addEventListener("click", () => {
+        downloadWithAuth(
+          "/api/reports/staff-week.csv?week=previous",
+          "staff-attendance-last-week.csv"
+        ).catch((err) => toast(err.message));
       });
 
       $("#backup-btn").addEventListener("click", async () => {

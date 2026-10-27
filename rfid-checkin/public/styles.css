@@ -86,29 +86,32 @@ a:hover {
 .nav a,
 .btn,
 button,
-.mode-btn {
+.mode-btn,
+.suggestion-item {
   min-height: 48px;
   min-width: 48px;
   border-radius: 12px;
-  border: 1px solid transparent;
+  border: 2px solid var(--brand-dark);
   font: inherit;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  padding: 0.7rem 1rem;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  padding: 0.7rem 1.1rem;
+  box-shadow: 0 2px 0 rgba(28, 42, 34, 0.12);
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .nav a {
-  background: var(--panel);
-  border-color: var(--line);
-  color: var(--ink);
+  background: #fff;
+  border-color: var(--brand);
+  color: var(--brand-dark);
   display: inline-flex;
   align-items: center;
+  text-decoration: none;
 }
 
 .nav a.active {
   background: var(--brand);
-  border-color: var(--brand);
+  border-color: var(--brand-dark);
   color: #fff;
   text-decoration: none;
 }
@@ -117,25 +120,84 @@ button,
 button {
   background: var(--brand);
   color: #fff;
+  border-color: var(--brand-dark);
 }
 
 .btn:hover,
 button:hover,
 .mode-btn:hover,
-.nav a:hover {
+.nav a:hover,
+.suggestion-item:hover {
   transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(28, 42, 34, 0.14);
+  text-decoration: none;
+}
+
+.btn:focus-visible,
+button:focus-visible,
+.mode-btn:focus-visible,
+.nav a:focus-visible {
+  outline: 3px solid #f0c14a;
+  outline-offset: 2px;
 }
 
 .btn.secondary,
 button.secondary {
-  background: var(--panel);
-  color: var(--ink);
-  border-color: var(--line);
+  background: #fff;
+  color: var(--brand-dark);
+  border-color: var(--brand);
 }
 
 .btn.danger,
 button.danger {
   background: var(--error);
+  border-color: #6e1010;
+  color: #fff;
+}
+
+.mode-btn {
+  background: #fff;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.mode-btn.active {
+  background: var(--brand);
+  border-color: var(--brand-dark);
+  color: #fff;
+}
+
+.manual-panel {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--line);
+}
+
+.manual-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: #eef6f1;
+  border: 2px solid var(--brand);
+  border-radius: var(--radius);
+}
+
+.manual-selected[hidden] {
+  display: none !important;
+}
+
+.btn-in {
+  background: var(--in) !important;
+  border-color: var(--brand-dark) !important;
+}
+
+.btn-out {
+  background: var(--out) !important;
+  border-color: #5c3010 !important;
 }
 
 .panel {

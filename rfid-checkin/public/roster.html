@@ -13,7 +13,7 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand">Student Roster<span>Parents · tags · folders</span></div>
+      <div class="brand">Roster<span>Students · staff · tags</span></div>
       <nav class="nav">
         <a href="/">Tap</a>
         <a href="/roster.html" class="active">Roster</a>
@@ -38,8 +38,8 @@
     <div id="staff-content" hidden>
       <div class="grid-2">
         <section class="panel">
-          <h2 id="form-title">Add student</h2>
-          <p class="muted">Link parent contact + an RFID tag. Tape the same tag to their folder.</p>
+          <h2 id="form-title">Add person</h2>
+          <p class="muted">Students: parent email + RFID tag. Staff: check “Staff member” for payroll reports (tag optional).</p>
           <form id="student-form">
             <input type="hidden" id="student-id" />
             <div class="field">
@@ -69,10 +69,13 @@
               <input id="parent-phone" placeholder="Optional" />
             </div>
             <div class="field">
-              <label class="checkbox-row"><input type="checkbox" id="student-active" checked /> Active student</label>
+              <label class="checkbox-row"><input type="checkbox" id="student-active" checked /> Active</label>
+            </div>
+            <div class="field">
+              <label class="checkbox-row"><input type="checkbox" id="is-staff" /> Staff member (weekly accountant report)</label>
             </div>
             <div class="row">
-              <button type="submit" id="save-btn">Save student</button>
+              <button type="submit" id="save-btn">Save</button>
               <button type="button" id="reset-btn" class="secondary">Clear form</button>
             </div>
           </form>
@@ -116,6 +119,7 @@
                 <th>Name</th>
                 <th>Parent</th>
                 <th>Tag</th>
+                <th>Type</th>
                 <th>Status</th>
                 <th></th>
               </tr>
@@ -149,8 +153,9 @@
         $("#student-form").reset();
         $("#student-id").value = "";
         $("#student-active").checked = true;
-        $("#form-title").textContent = "Add student";
-        $("#save-btn").textContent = "Save student";
+        $("#is-staff").checked = false;
+        $("#form-title").textContent = "Add person";
+        $("#save-btn").textContent = "Save";
         selectedId = null;
         $("#tag-target").textContent = "Select a student first";
         $("#tag-input").value = "";
@@ -200,6 +205,7 @@
               <div class="muted">${escapeHtml(s.parentPhone || "")}</div>
             </td>
             <td>${s.tagUid ? `<code>${escapeHtml(s.tagUid)}</code>` : '<span class="muted">No tag</span>'}</td>
+            <td>${s.isStaff ? '<span class="badge out">Staff</span>' : '<span class="muted">Student</span>'}</td>
             <td>
               ${s.isCheckedIn ? '<span class="badge in">In centre</span>' : ""}
               ${s.active ? "" : '<span class="badge out">Inactive</span>'}
@@ -223,10 +229,11 @@
         $("#parent-phone").value = s.parentPhone || "";
         $("#parent-email").value = s.parentEmail || "";
         $("#student-active").checked = s.active;
+        $("#is-staff").checked = !!s.isStaff;
         $("#subj-math").checked = s.subjects.includes("Math");
         $("#subj-reading").checked = s.subjects.includes("Reading");
-        $("#form-title").textContent = "Edit student";
-        $("#save-btn").textContent = "Update student";
+        $("#form-title").textContent = "Edit person";
+        $("#save-btn").textContent = "Update";
         setSelected(s);
       }
 
@@ -272,6 +279,7 @@
           parentPhone: $("#parent-phone").value.trim(),
           parentEmail: $("#parent-email").value.trim(),
           active: $("#student-active").checked,
+          isStaff: $("#is-staff").checked,
         };
         try {
           const id = $("#student-id").value;

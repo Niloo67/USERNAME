@@ -22,6 +22,7 @@ db.exec(`
     parent_phone TEXT NOT NULL DEFAULT '',
     parent_email TEXT NOT NULL DEFAULT '',
     tag_uid TEXT UNIQUE COLLATE NOCASE,
+    is_staff INTEGER NOT NULL DEFAULT 0,
     active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
@@ -53,10 +54,13 @@ db.exec(`
   );
 `);
 
-// Older copies may lack tag_uid
+// Migrations for older databases
 const cols = db.prepare("PRAGMA table_info(students)").all().map((c) => c.name);
 if (!cols.includes("tag_uid")) {
   db.exec("ALTER TABLE students ADD COLUMN tag_uid TEXT");
+}
+if (!cols.includes("is_staff")) {
+  db.exec("ALTER TABLE students ADD COLUMN is_staff INTEGER NOT NULL DEFAULT 0");
 }
 db.exec(
   "CREATE UNIQUE INDEX IF NOT EXISTS idx_students_tag_uid ON students(tag_uid) WHERE tag_uid IS NOT NULL AND tag_uid != ''"
@@ -86,6 +90,8 @@ function ensureDefaultSettings() {
     email_on_checkin: process.env.EMAIL_ON_CHECKIN !== "false" ? "true" : "false",
     email_on_checkout: process.env.EMAIL_ON_CHECKOUT !== "false" ? "true" : "false",
     centre_name: process.env.CENTRE_NAME || "Kumon NDG Learning Centre",
+    accountant_email: process.env.ACCOUNTANT_EMAIL || "",
+    staff_report_auto_weekly: process.env.STAFF_REPORT_AUTO_WEEKLY === "true" ? "true" : "false",
   };
   for (const [key, value] of Object.entries(defaults)) {
     if (getSetting(key) === null) {
@@ -116,6 +122,7 @@ function mapStudent(row) {
     parentEmail: row.parent_email || "",
     tagUid: row.tag_uid || "",
     hasTag: Boolean(row.tag_uid),
+    isStaff: Boolean(row.is_staff),
     active: Boolean(row.active),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -203,6 +210,7 @@ function createStudent({
   parentPhone = "",
   parentEmail = "",
   tagUid = "",
+  isStaff = false,
   active = true,
 }) {
   const code = String(studentCode || "").trim();
@@ -214,8 +222,8 @@ function createStudent({
   try {
     const info = db
       .prepare(
-        `INSERT INTO students (student_code, name, subjects, parent_phone, parent_email, tag_uid, active)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO students (student_code, name, subjects, parent_phone, parent_email, tag_uid, is_staff, active)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         code,
@@ -224,6 +232,7 @@ function createStudent({
         String(parentPhone || "").trim(),
         String(parentEmail || "").trim(),
         uid,
+        isStaff ? 1 : 0,
         active ? 1 : 0
       );
     return getStudentById(info.lastInsertRowid);
@@ -256,6 +265,7 @@ function updateStudent(id, fields) {
       fields.tagUid !== undefined
         ? normalizeTagUid(fields.tagUid)
         : existing.tagUid,
+    isStaff: fields.isStaff !== undefined ? Boolean(fields.isStaff) : existing.isStaff,
     active: fields.active !== undefined ? Boolean(fields.active) : existing.active,
   };
 
@@ -266,8 +276,8 @@ function updateStudent(id, fields) {
   try {
     db.prepare(
       `UPDATE students
-       SET student_code = ?, name = ?, subjects = ?, parent_phone = ?, parent_email = ?, tag_uid = ?, active = ?,
-           updated_at = datetime('now', 'localtime')
+       SET student_code = ?, name = ?, subjects = ?, parent_phone = ?, parent_email = ?, tag_uid = ?,
+           is_staff = ?, active = ?, updated_at = datetime('now', 'localtime')
        WHERE id = ?`
     ).run(
       next.studentCode,
@@ -276,6 +286,7 @@ function updateStudent(id, fields) {
       next.parentPhone,
       next.parentEmail,
       next.tagUid || null,
+      next.isStaff ? 1 : 0,
       next.active ? 1 : 0,
       id
     );
@@ -475,10 +486,61 @@ function listDirectoryStudents() {
     name: s.name,
     subjects: s.subjects,
     active: s.active,
+    isStaff: s.isStaff,
     checkedInAt: s.checkedInAt,
     isCheckedIn: s.isCheckedIn,
     tagLinked: Boolean(s.tagUid),
   }));
+}
+
+/** Monday–Sunday (local) containing referenceDate, or previous full week if forPreviousWeek. */
+function getWeekRange({ forPreviousWeek = false, referenceDate = new Date() } = {}) {
+  const d = new Date(referenceDate);
+  d.setHours(12, 0, 0, 0);
+  const day = d.getDay(); // 0 Sun … 6 Sat
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + mondayOffset);
+  if (forPreviousWeek) {
+    monday.setDate(monday.getDate() - 7);
+  }
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  const toYmd = (x) => {
+    const y = x.getFullYear();
+    const m = String(x.getMonth() + 1).padStart(2, "0");
+    const dd = String(x.getDate()).padStart(2, "0");
+    return `${y}-${m}-${dd}`;
+  };
+  return { from: toYmd(monday), to: toYmd(sunday) };
+}
+
+function listStaffLogs({ from, to } = {}) {
+  const range = from && to ? { from, to } : getWeekRange({ forPreviousWeek: true });
+  const rows = db
+    .prepare(
+      `SELECT l.*
+       FROM logs l
+       INNER JOIN students s ON s.id = l.student_id
+       WHERE s.is_staff = 1
+         AND date(l.timestamp) >= date(?)
+         AND date(l.timestamp) <= date(?)
+       ORDER BY l.timestamp ASC, l.id ASC`
+    )
+    .all(range.from, range.to);
+  return {
+    from: range.from,
+    to: range.to,
+    logs: rows.map((row) => ({
+      id: row.id,
+      studentId: row.student_id,
+      studentCode: row.student_code,
+      studentName: row.student_name,
+      action: row.action,
+      mode: row.mode,
+      timestamp: row.timestamp,
+    })),
+  };
 }
 
 function nextStudentCode() {
@@ -517,6 +579,8 @@ module.exports = {
   checkInStudent,
   checkOutStudent,
   listLogs,
+  listStaffLogs,
+  getWeekRange,
   getRetentionInfo,
   nextStudentCode,
 };

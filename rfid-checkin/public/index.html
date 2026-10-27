@@ -64,22 +64,34 @@
 
         <div class="row" style="margin-top: 0.85rem;">
           <button type="button" id="refocus-scan" class="secondary">Focus reader box</button>
-          <button type="button" id="backup-toggle" class="secondary" aria-expanded="false" aria-controls="backup-panel">
-            Manual backup
-          </button>
         </div>
 
-        <div id="backup-panel" class="backup-panel" hidden>
-          <div class="field suggestions" style="margin-top: 0.85rem;">
+        <div class="manual-panel" id="manual-panel">
+          <h3>Manual check-in / check-out</h3>
+          <p class="muted">
+            For forgotten tags or staff punching in by name. Type a full name or last name, pick the person, then choose Check in or Check out.
+          </p>
+          <div class="field suggestions">
             <label class="label" for="manual-search">Search by name</label>
-            <input id="manual-search" autocomplete="off" placeholder="Start typing a name…" />
-            <div id="suggestions" class="suggestions-list"></div>
+            <input id="manual-search" autocomplete="off" placeholder="e.g. Chen or Ava Chen…" />
+            <div id="suggestions" class="suggestions-list" role="listbox"></div>
           </div>
-          <div class="field">
-            <label class="label" for="manual-code">Type student ID (backup)</label>
+          <div id="manual-selected" class="manual-selected" hidden>
+            <div>
+              <strong id="manual-selected-name">—</strong>
+              <div class="muted" id="manual-selected-meta"></div>
+            </div>
+            <div class="row">
+              <button type="button" id="manual-check-in" class="btn-in">Check in</button>
+              <button type="button" id="manual-check-out" class="btn-out">Check out</button>
+              <button type="button" id="manual-clear" class="secondary">Clear</button>
+            </div>
+          </div>
+          <div class="field" style="margin-top: 0.85rem;">
+            <label class="label" for="manual-code">Or type student / staff ID</label>
             <div class="row">
               <input id="manual-code" autocomplete="off" placeholder="e.g. K-0001" style="flex: 1;" />
-              <button type="button" id="manual-submit" class="secondary">Submit</button>
+              <button type="button" id="manual-submit" class="secondary">Find ID</button>
             </div>
           </div>
         </div>
@@ -104,6 +116,7 @@
       let mode = "auto";
       let busy = false;
       let rosterCache = [];
+      let manualSelected = null;
 
       const scanInput = $("#scan-input");
       const feedback = $("#feedback");
@@ -113,6 +126,7 @@
       const suggestions = $("#suggestions");
       const manualSearch = $("#manual-search");
       const readyBanner = $("#scanner-ready");
+      const manualSelectedBox = $("#manual-selected");
 
       scanInput.addEventListener("paste", (e) => {
         e.preventDefault();
@@ -136,13 +150,25 @@
       }
 
       $("#refocus-scan").addEventListener("click", focusReader);
-      $("#backup-toggle").addEventListener("click", () => {
-        const panel = $("#backup-panel");
-        const open = panel.hidden;
-        panel.hidden = !open;
-        $("#backup-toggle").setAttribute("aria-expanded", open ? "true" : "false");
-        if (!open) focusReader();
-      });
+
+      function clearManualSelection() {
+        manualSelected = null;
+        manualSelectedBox.hidden = true;
+        $("#manual-selected-name").textContent = "—";
+        $("#manual-selected-meta").textContent = "";
+      }
+
+      function selectManualPerson(s) {
+        manualSelected = s;
+        manualSelectedBox.hidden = false;
+        $("#manual-selected-name").textContent = s.name;
+        const bits = [s.studentCode];
+        if (s.isStaff) bits.push("Staff");
+        bits.push(s.isCheckedIn ? "currently in" : "currently out");
+        $("#manual-selected-meta").textContent = bits.join(" · ");
+        manualSearch.value = s.name;
+        suggestions.classList.remove("open");
+      }
 
       function showFeedback(kind, title, detail) {
         feedback.className = "feedback " + (kind || "");
@@ -169,7 +195,7 @@
           <li class="list-item" data-checked-in-at="${escapeHtml(s.checkedInAt || "")}">
             <div>
               <div class="name">${escapeHtml(s.name)}</div>
-              <div class="muted">${escapeHtml(s.studentCode)}${s.tagUid ? " · tag linked" : ""}</div>
+              <div class="muted">${escapeHtml(s.studentCode)}${s.isStaff ? " · staff" : ""}${s.tagLinked ? " · tag linked" : ""}</div>
               <div class="tags">${subjectTags(s.subjects)}</div>
             </div>
             <div class="row">
@@ -275,31 +301,58 @@
             (s) => `
           <button type="button" class="suggestion-item" data-code="${escapeHtml(s.studentCode)}">
             <strong>${escapeHtml(s.name)}</strong>
-            <span class="muted"> · ${escapeHtml(s.studentCode)}${s.isCheckedIn ? " · in centre" : ""}</span>
+            <span class="muted"> · ${escapeHtml(s.studentCode)}${s.isStaff ? " · staff" : ""}${
+              s.isCheckedIn ? " · in centre" : ""
+            }</span>
           </button>`
           )
           .join("");
         suggestions.classList.add("open");
       }
 
-      manualSearch.addEventListener("input", () => renderSuggestions(manualSearch.value));
-      manualSearch.addEventListener("blur", () => setTimeout(() => suggestions.classList.remove("open"), 150));
+      async function punchManual(forceMode) {
+        if (!manualSelected) {
+          toast("Pick a person from the search list first");
+          return;
+        }
+        await processCode(manualSelected.studentCode, forceMode);
+        await loadRoster();
+        const refreshed = rosterCache.find((s) => s.studentCode === manualSelected.studentCode);
+        if (refreshed) selectManualPerson(refreshed);
+      }
+
+      manualSearch.addEventListener("input", () => {
+        clearManualSelection();
+        renderSuggestions(manualSearch.value);
+      });
+      manualSearch.addEventListener("blur", () => setTimeout(() => suggestions.classList.remove("open"), 180));
       suggestions.addEventListener("click", (e) => {
         const btn = e.target.closest(".suggestion-item");
         if (!btn) return;
+        const s = rosterCache.find((x) => x.studentCode === btn.dataset.code);
+        if (s) selectManualPerson(s);
+      });
+      $("#manual-check-in").addEventListener("click", () => punchManual("force_in"));
+      $("#manual-check-out").addEventListener("click", () => punchManual("force_out"));
+      $("#manual-clear").addEventListener("click", () => {
+        clearManualSelection();
         manualSearch.value = "";
-        suggestions.classList.remove("open");
-        processCode(btn.dataset.code);
+        focusReader();
       });
       $("#manual-submit").addEventListener("click", () => {
-        processCode($("#manual-code").value);
-        $("#manual-code").value = "";
+        const code = $("#manual-code").value.trim();
+        const s = rosterCache.find((x) => x.studentCode.toLowerCase() === code.toLowerCase());
+        if (s) {
+          selectManualPerson(s);
+          $("#manual-code").value = "";
+        } else {
+          toast("No match for that ID");
+        }
       });
       $("#manual-code").addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          processCode($("#manual-code").value);
-          $("#manual-code").value = "";
+          $("#manual-submit").click();
         }
       });
 

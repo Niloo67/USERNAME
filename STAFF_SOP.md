@@ -13,8 +13,8 @@ Use this with the franchise **Baseline Requirements Checklist**. Annual certific
 
 1. Students check in when they **arrive** and check out when they **leave** — do not enter later only for paperwork.
 2. Use Auto mode unless you need Force In / Force Out.
-3. Forgotten badge/tag: use the manual name search on the desk page (no parent contact shown there).
-4. Staff/employees without a tag: add them on Roster with a code, or check them in manually by name/ID.
+3. Forgotten badge/tag: use **Manual check-in / check-out** on the Tap page (search by name → Check in / Check out).
+4. Staff/employees: mark as **Staff** on Roster; they punch by name (or tag). Weekly accountant CSV is in Settings.
 5. Watch the **Who is here** list whenever you need current presence.
 
 ## Staff PIN pages

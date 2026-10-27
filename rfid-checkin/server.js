@@ -7,7 +7,10 @@ const attendanceRouter = require("./routes/attendance");
 const exportRouter = require("./routes/export");
 const settingsRouter = require("./routes/settings");
 const backupRouter = require("./routes/backup");
+const reportsRouter = require("./routes/reports");
 const { usingDefaultPin, staffPinConfigured } = require("./middleware/auth");
+const { listStaffLogs, getWeekRange, getSetting, setSetting } = require("./db");
+const { sendStaffWeekReport } = require("./services/email");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -31,6 +34,33 @@ app.use("/api", attendanceRouter);
 app.use("/api/export", exportRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/backup", backupRouter);
+app.use("/api/reports", reportsRouter);
+
+/** Optional: email last week's staff punches every Monday while the app is running. */
+async function maybeSendWeeklyStaffReport() {
+  if (getSetting("staff_report_auto_weekly", "false") !== "true") return;
+  const now = new Date();
+  if (now.getDay() !== 1) return; // Monday
+  const { from, to } = getWeekRange({ forPreviousWeek: true });
+  const weekKey = `${from}_${to}`;
+  if (getSetting("last_staff_report_week", "") === weekKey) return;
+  const { logs } = listStaffLogs({ from, to });
+  const result = await sendStaffWeekReport({ from, to, logs });
+  if (result.status === "sent") {
+    setSetting("last_staff_report_sent", new Date().toISOString());
+    setSetting("last_staff_report_week", weekKey);
+    console.log(`Staff week report emailed (${from} → ${to}, ${logs.length} entries)`);
+  } else if (result.status !== "skipped") {
+    console.warn("Staff week report failed:", result.detail);
+  }
+}
+
+setInterval(() => {
+  maybeSendWeeklyStaffReport().catch((err) => console.warn(err.message));
+}, 60 * 60 * 1000);
+setTimeout(() => {
+  maybeSendWeeklyStaffReport().catch(() => {});
+}, 15_000);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

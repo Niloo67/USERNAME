@@ -62,6 +62,7 @@ router.post("/", requireStaff, (req, res) => {
       parentPhone: body.parentPhone,
       parentEmail: body.parentEmail,
       tagUid: body.tagUid,
+      isStaff: Boolean(body.isStaff),
       active: body.active !== false,
     });
     res.status(201).json({ student });

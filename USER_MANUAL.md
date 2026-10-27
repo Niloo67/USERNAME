@@ -13,7 +13,8 @@ App address on the desk computer: **http://localhost:3001**
 - The desk screen shows **who is here right now**
 - Parents can get an **email** when their child checks in or out (once email is set up)
 - Staff can review **past attendance** and export it
-- If someone forgets their tag, staff can check them in **manually by name**
+- If someone forgets their tag, use **Manual check-in / check-out** on the Tap page (search by name)
+- Employees can be marked as **Staff** and punch in/out the same way; a **weekly CSV** can be emailed to your accountant
 
 ---
 
@@ -21,10 +22,10 @@ App address on the desk computer: **http://localhost:3001**
 
 | Page | Who uses it | What it’s for |
 | --- | --- | --- |
-| **Tap** | Desk (main screen) | Check students in/out by tapping tags |
-| **Roster** | Staff (PIN) | Add students, parent emails, link/unlink tags |
+| **Tap** | Desk (main screen) | Tag tap + always-visible manual name check-in/out |
+| **Roster** | Staff (PIN) | Add students/staff, parent emails, link/unlink tags |
 | **Logs** | Staff (PIN) | Review past check-ins/outs, export CSV |
-| **Settings** | Staff (PIN) | Centre name, email options, backups |
+| **Settings** | Staff (PIN) | Centre name, emails, accountant report, backups |
 
 **Staff PIN** is required for Roster, Logs, and Settings. Ask the centre manager for the PIN (set in the `.env` file as `STAFF_PIN`).
 
@@ -123,14 +124,25 @@ You will hear a short sound:
 
 Switch back to **Auto** after using Force.
 
-### Forgot tag / no tag / staff
+### Manual check-in / check-out (always on the Tap page)
 
-1. On the Tap page, open **Manual backup**  
-2. Type the student name or ID  
-3. Choose them from the list  
-4. They will check in/out without a tag  
+Use this when a tag is forgotten, or for **staff punching in/out by name**.
 
-You can also add staff as “students” on Roster (with a code) and check them in manually.
+1. On the **Tap** page, find **Manual check-in / check-out** (always visible under the reader box)  
+2. Type a **full name** or **last name** in the search box  
+3. Click the matching person in the list  
+4. Click **Check in** or **Check out**  
+
+You can also type a student/staff ID and click **Find ID**.
+
+### Add staff for payroll / accountant reports
+
+1. **Roster** → add the employee (name + ID)  
+2. Check **Staff member (weekly accountant report)**  
+3. Save (RFID tag optional — they can use manual name punch)  
+4. They punch in/out on the Tap page like anyone else  
+
+Staff punches do **not** send parent emails.
 
 ### Unknown tag
 
@@ -172,6 +184,21 @@ Once SMTP is configured in `.env` (usually a Gmail App Password):
 - In Logs, the Email column shows `sent`, `failed`, or `skipped`
 
 Ask the manager to fill `SMTP_USER`, `SMTP_PASS`, etc. in `.env` if emails are not sending.
+
+---
+
+## 8b. Weekly staff report to the accountant
+
+1. Mark employees as **Staff** on Roster (see above)  
+2. **Settings** → enter **Accountant email** → Save  
+3. Each week either:
+   - Click **Email last week’s staff report now**, or  
+   - Turn on **Auto-email last week’s staff CSV every Monday** (laptop + app must be running), or  
+   - Click **Download staff CSV** and forward it yourself  
+
+The report is a spreadsheet of staff check-in / check-out times for the previous Monday–Sunday.
+
+SMTP must be configured for emailing (same as parent emails).
 
 ---
 
@@ -227,7 +254,26 @@ Ask the manager to fill `SMTP_USER`, `SMTP_PASS`, etc. in `.env` if emails are n
 
 ---
 
-## 13. Quick cheat sheet
+## 13. Updating the app (after a new GitHub version)
+
+You do **not** need Cursor on the Windows laptop.
+
+1. Download the new ZIP from GitHub (or `git pull` if you cloned)  
+2. Copy your existing `rfid-checkin\data` folder into the new `rfid-checkin` folder (keeps students, tags, logs)  
+3. Copy your existing `.env` file too (PIN, SMTP, accountant email)  
+4. In PowerShell:
+
+```powershell
+cd path\to\rfid-checkin
+npm install
+npm start
+```
+
+Reader and tags stay the same.
+
+---
+
+## 14. Quick cheat sheet
 
 **Open app:** `npm start` → http://localhost:3001  
 
@@ -235,13 +281,17 @@ Ask the manager to fill `SMTP_USER`, `SMTP_PASS`, etc. in `.env` if emails are n
 
 **Leave:** tap folder → check out  
 
-**Forgot tag:** Manual backup → search name  
+**Forgot tag / staff punch:** Manual check-in / check-out → search name → Check in / Check out  
 
 **New student:** Roster → Save → Select → tap sticker → Link tag → stick on folder  
 
+**New staff:** Roster → check Staff member → Save → punch by name on Tap  
+
 **See history:** Logs → pick dates → Export CSV if needed  
 
-**Weekly:** Settings → Create backup → copy `data\backups` to USB  
+**Accountant:** Settings → accountant email → Email last week’s staff report  
+
+**Weekly backup:** Settings → Create backup → copy `data\backups` to USB  
 
 ---
 
