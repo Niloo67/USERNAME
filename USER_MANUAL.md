@@ -15,6 +15,7 @@ App address on the desk computer: **http://localhost:3001**
 - Staff can review **past attendance** and export it
 - If someone forgets their tag, use **Manual check-in / check-out** on the Tap page (search by name)
 - Employees can be marked as **Staff** and punch in/out the same way; a **weekly CSV** can be emailed to your accountant
+- Attendance is **saved live** on the laptop; a **daily backup** can copy itself to OneDrive/Google Drive automatically (so nobody has to remember a weekly USB copy)
 
 ---
 
@@ -25,7 +26,7 @@ App address on the desk computer: **http://localhost:3001**
 | **Tap** | Desk (main screen) | Tag tap + always-visible manual name check-in/out |
 | **Roster** | Staff (PIN) | Add students/staff, parent emails, link/unlink tags |
 | **Logs** | Staff (PIN) | Review past check-ins/outs, export CSV |
-| **Settings** | Staff (PIN) | Centre name, emails, accountant report, backups |
+| **Settings** | Staff (PIN) | Centre name, emails, accountant report, automatic cloud backup |
 
 **Staff PIN** is required for Roster, Logs, and Settings. Ask the centre manager for the PIN (set in the `.env` file as `STAFF_PIN`).
 
@@ -97,6 +98,23 @@ Repeat for each student.
 2. Click **Unlink tag** (or Delete/deactivate the student)  
 3. **Select** the new student  
 4. Tap the same physical sticker → **Reassign tag**
+
+### D. Turn on automatic cloud backup (do this once)
+
+So backups happen even if someone forgets:
+
+1. Install **OneDrive** or **Google Drive** on the Windows laptop (if not already)  
+2. Create a folder such as `OneDrive\Kumon-backups`  
+3. Open **Settings** → Staff PIN  
+4. Paste that folder’s full path into **Cloud backup folder**  
+   Example: `C:\Users\YourName\OneDrive\Kumon-backups`  
+5. Leave **Automatic daily backup** checked → **Save backup settings**  
+
+While `npm start` is running during centre hours, the app backs up **once per day** to:
+- `rfid-checkin\data\backups\` on the laptop, and  
+- your OneDrive/Google Drive folder (cloud sync — off the laptop)
+
+You can still click **Create backup now** anytime. See §10 for more detail.
 
 ---
 
@@ -187,7 +205,7 @@ Ask the manager to fill `SMTP_USER`, `SMTP_PASS`, etc. in `.env` if emails are n
 
 ---
 
-## 8b. Weekly staff report to the accountant
+## 9. Weekly staff report to the accountant
 
 1. Mark employees as **Staff** on Roster (see above)  
 2. **Settings** → **Weekly staff report emails** should include both:
@@ -205,11 +223,19 @@ SMTP must be configured for emailing (same as parent emails).
 
 ---
 
-## 9. Settings & automatic cloud backup
+## 10. Settings & automatic cloud backup
 
-Attendance is **saved automatically** every time someone checks in or out (on the laptop).
+### Live data vs backup copies
 
-### Automatic daily backup (so nobody forgets)
+| | What it is |
+| --- | --- |
+| **Live attendance** | Saved instantly on the laptop every check-in/out (`rfid-checkin\data\`) |
+| **Daily backup** | Extra copy the app makes **once per day** while running |
+| **Cloud folder** | That backup also copied into OneDrive/Google Drive so it syncs off the laptop |
+
+You do **not** need to remember a weekly USB copy if the cloud folder is set and the app stays open during centre hours.
+
+### Set this up once (manager)
 
 1. On the Windows laptop, install **OneDrive** or **Google Drive**  
 2. Create a folder such as `OneDrive\Kumon-backups`  
@@ -218,26 +244,35 @@ Attendance is **saved automatically** every time someone checks in or out (on th
    Example: `C:\Users\YourName\OneDrive\Kumon-backups`  
 5. Leave **Automatic daily backup** checked → **Save backup settings**  
 
-While `npm start` is running, the app makes a backup **once per day** into:
+### What happens automatically
+
+While `npm start` is running, the app (about 20 seconds after start, then hourly checks) makes **at most one backup per calendar day** into:
+
 - `rfid-checkin\data\backups\` (local), and  
-- your OneDrive/Google Drive folder (cloud sync)
+- your OneDrive/Google Drive folder (if the path is set)
 
-You can still click **Create backup now** anytime.
+Settings shows **Last backup** after one has run. You can still click **Create backup now** anytime (for example before a laptop replacement).
 
-Keep cloud copies for **at least 2 years**.
+Keep cloud copies for **at least 2 years**. Do not delete old backup files until they are older than 2 years **and** you have another copy.
+
+### Other Settings on this page
+
+- Centre name (used on emails)  
+- Parent email on/off for check-in and check-out  
+- Weekly staff report emails and “email last week now”  
 
 ---
 
-## 10. Closing the centre
+## 11. Closing the centre
 
 1. Check **Who is here** — check out anyone who has left  
-2. Optional: create a backup  
+2. You usually do **not** need a manual backup if automatic daily cloud backup is set up  
 3. Close the browser  
 4. In PowerShell, press `Ctrl+C` to stop the app (or shut down the laptop)
 
 ---
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 | Problem | What to try |
 | --- | --- |
@@ -248,30 +283,32 @@ Keep cloud copies for **at least 2 years**.
 | Can’t open Roster/Logs | Enter the Staff PIN. If forgotten, open `.env` and check `STAFF_PIN`. |
 | Page won’t load | Confirm `npm start` is running. Use `http://localhost:3001`. |
 | Emails not sending | SMTP not configured, or Gmail App Password missing — check Settings status. |
+| Backup not appearing in OneDrive | Confirm the **Cloud backup folder** path is correct, OneDrive is signed in and syncing, and `npm start` was running that day. Click **Create backup now** to test. |
+| “Cloud copy failed” after backup | The path may be wrong, the drive letter changed, or OneDrive is offline — fix the path in Settings and try again. Local backup under `data\backups\` still exists. |
 | Laptop / app down | Use a **paper sign-in sheet** for that session only; resume digital check-in when the app is back. |
 
 ---
 
-## 12. Rules to remember (franchise)
+## 13. Rules to remember (franchise)
 
 1. Use this **digital** app as the normal method (not paper/Excel as the everyday system)  
 2. Every student needs a **unique ID** and ideally a linked tag  
 3. Tap at **real** arrival and departure — don’t enter times later just for paperwork  
 4. Staff should know this process and follow it every day  
 5. Use **Who is here** and **Logs** when you need current or past attendance  
-6. **Back up weekly** to USB/cloud  
+6. **Automatic daily backup** to a OneDrive/Google Drive folder (set once in Settings; keep the app running during centre hours)  
 7. Protect parent emails/phones — only on PIN pages  
 8. Keep records/backups for **at least 2 years**
 
 ---
 
-## 13. Updating the app (after a new GitHub version)
+## 14. Updating the app (after a new GitHub version)
 
 You do **not** need Cursor on the Windows laptop.
 
 1. Download the new ZIP from GitHub (or `git pull` if you cloned)  
 2. Copy your existing `rfid-checkin\data` folder into the new `rfid-checkin` folder (keeps students, tags, logs)  
-3. Copy your existing `.env` file too (PIN, SMTP, accountant email)  
+3. Copy your existing `.env` file too (PIN, SMTP, accountant email, cloud backup path if set there)  
 4. In PowerShell:
 
 ```powershell
@@ -280,11 +317,13 @@ npm install
 npm start
 ```
 
+5. Open **Settings** once and confirm **Cloud backup folder** and **Automatic daily backup** are still set  
+
 Reader and tags stay the same.
 
 ---
 
-## 14. Quick cheat sheet
+## 15. Quick cheat sheet
 
 **Open app:** `npm start` → http://localhost:3001  
 
@@ -300,9 +339,11 @@ Reader and tags stay the same.
 
 **See history:** Logs → pick dates → Export CSV if needed  
 
-**Accountant:** Settings → accountant email → Email last week’s staff report  
+**Accountant:** Settings → weekly staff report emails → Email last week’s staff report  
 
-**Cloud backup:** Settings → set OneDrive/Google Drive path → auto daily backup runs while the app is open  
+**Cloud backup (once):** Settings → paste OneDrive/Google Drive path → leave Automatic daily backup on → Save  
+
+**If unsure a backup ran:** Settings → check **Last backup**, or click **Create backup now**  
 
 ---
 

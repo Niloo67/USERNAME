@@ -23,19 +23,20 @@ Roster, Logs, and Settings require the **Staff PIN** (set `STAFF_PIN` in `.env` 
 
 - Roster: add students, parent email, print QR badges / link RFID tags.
 - Logs: review history by date range; export CSV when needed.
-- Settings: centre name, email toggles, **Create backup**, franchise checklist.
+- Settings: centre name, email toggles, **Cloud backup folder** + automatic daily backup, franchise checklist.
 
 ## Closing
 
 1. Confirm everyone who left is checked out (Who is here should match reality).
-2. Optionally create a backup from Settings before shutdown.
+2. No weekly USB step needed if automatic cloud backup is configured — optional **Create backup now** before a laptop change.
 
 ## Automatic backup (requirement 6 & 8)
 
 1. Set **Cloud backup folder** in Settings to a OneDrive/Google Drive path (once).
-2. Keep the app running during centre hours — a backup runs **automatically once per day** to local + cloud.
-3. Keep cloud copies for **at least 2 years**.
-4. Do not delete `data/*.sqlite` or old backup files until they are older than 2 years **and** you have another copy.
+2. Leave **Automatic daily backup** on.
+3. Keep the app running during centre hours — a backup runs **automatically once per day** to local `data/backups/` + the cloud folder.
+4. Keep cloud copies for **at least 2 years**.
+5. Do not delete `data/*.sqlite` or old backup files until they are older than 2 years **and** you have another copy.
 
 ## If the laptop or app is down
 
@@ -55,6 +56,6 @@ Roster, Logs, and Settings require the **Staff PIN** (set `STAFF_PIN` in `.env` 
 Every staff member who works the desk should be able to:
 
 1. Check a student in and out with the scanner/reader.
-2. Use manual backup entry.
+2. Use Manual check-in / check-out by name when a tag is missing.
 3. Open Who is here and Logs.
-4. Create a backup and know where USB copies go.
+4. Know that backups run automatically to the OneDrive/Google Drive folder set in Settings.
