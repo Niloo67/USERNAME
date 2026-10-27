@@ -190,13 +190,16 @@ Ask the manager to fill `SMTP_USER`, `SMTP_PASS`, etc. in `.env` if emails are n
 ## 8b. Weekly staff report to the accountant
 
 1. Mark employees as **Staff** on Roster (see above)  
-2. **Settings** → enter **Accountant email** → Save  
+2. **Settings** → **Weekly staff report emails** should include both:
+   - `Nassershayan@gmail.com` (accountant)  
+   - `montreal-ndg@ikumon.com` (Kumon NDG)  
+   (comma-separated; both are the default) → Save  
 3. Each week either:
    - Click **Email last week’s staff report now**, or  
    - Turn on **Auto-email last week’s staff CSV every Monday** (laptop + app must be running), or  
    - Click **Download staff CSV** and forward it yourself  
 
-The report is a spreadsheet of staff check-in / check-out times for the previous Monday–Sunday.
+The report is a spreadsheet of staff check-in / check-out times for the previous Monday–Sunday. It goes to **both** addresses when both are listed.
 
 SMTP must be configured for emailing (same as parent emails).
 

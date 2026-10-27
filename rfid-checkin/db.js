@@ -90,13 +90,19 @@ function ensureDefaultSettings() {
     email_on_checkin: process.env.EMAIL_ON_CHECKIN !== "false" ? "true" : "false",
     email_on_checkout: process.env.EMAIL_ON_CHECKOUT !== "false" ? "true" : "false",
     centre_name: process.env.CENTRE_NAME || "Kumon NDG Learning Centre",
-    accountant_email: process.env.ACCOUNTANT_EMAIL || "",
+    accountant_email:
+      process.env.ACCOUNTANT_EMAIL ||
+      "Nassershayan@gmail.com, montreal-ndg@ikumon.com",
     staff_report_auto_weekly: process.env.STAFF_REPORT_AUTO_WEEKLY === "true" ? "true" : "false",
   };
   for (const [key, value] of Object.entries(defaults)) {
     if (getSetting(key) === null) {
       setSetting(key, value);
     }
+  }
+  // Ensure centre default recipients are present if the field was left blank
+  if (!String(getSetting("accountant_email", "")).trim()) {
+    setSetting("accountant_email", defaults.accountant_email);
   }
 }
 

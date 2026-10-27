@@ -1,6 +1,10 @@
 const nodemailer = require("nodemailer");
 const { getSetting } = require("../db");
 
+/** Default weekly staff report recipients: accountant + Kumon NDG */
+const DEFAULT_STAFF_REPORT_EMAILS =
+  "Nassershayan@gmail.com, montreal-ndg@ikumon.com";
+
 function smtpConfigured() {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
@@ -97,7 +101,10 @@ function getEmailStatus() {
     emailOnCheckin: getSetting("email_on_checkin", "true") === "true",
     emailOnCheckout: getSetting("email_on_checkout", "true") === "true",
     centreName: getSetting("centre_name", process.env.CENTRE_NAME || "Kumon NDG Learning Centre"),
-    accountantEmail: getSetting("accountant_email", process.env.ACCOUNTANT_EMAIL || ""),
+    accountantEmail: getSetting(
+      "accountant_email",
+      process.env.ACCOUNTANT_EMAIL || DEFAULT_STAFF_REPORT_EMAILS
+    ),
     staffReportAutoWeekly: getSetting("staff_report_auto_weekly", "false") === "true",
     lastStaffReportSent: getSetting("last_staff_report_sent", ""),
   };
@@ -126,13 +133,26 @@ function staffLogsToCsv(logs) {
  * Email accountant a CSV of staff punches for a week.
  * @returns {{ status: 'sent'|'skipped'|'failed', detail: string, from?: string, to?: string, count?: number }}
  */
+const DEFAULT_STAFF_REPORT_EMAILS =
+  "Nassershayan@gmail.com, montreal-ndg@ikumon.com";
+
+function parseEmailList(raw) {
+  return String(raw || "")
+    .split(/[,;]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 async function sendStaffWeekReport({ from, to, logs, overrideTo } = {}) {
-  const recipient = String(
-    overrideTo || getSetting("accountant_email", process.env.ACCOUNTANT_EMAIL || "")
+  const raw = String(
+    overrideTo ||
+      getSetting("accountant_email", process.env.ACCOUNTANT_EMAIL || DEFAULT_STAFF_REPORT_EMAILS)
   ).trim();
-  if (!recipient) {
-    return { status: "skipped", detail: "No accountant email configured" };
+  const recipients = parseEmailList(raw);
+  if (!recipients.length) {
+    return { status: "skipped", detail: "No accountant / centre email configured" };
   }
+  const recipient = recipients.join(", ");
   const transport = getTransporter();
   if (!transport) {
     return { status: "skipped", detail: "SMTP not configured" };
@@ -151,13 +171,15 @@ async function sendStaffWeekReport({ from, to, logs, overrideTo } = {}) {
     `Period: ${from} → ${to}`,
     `Entries: ${count}`,
     ``,
+    `Sent to: ${recipient}`,
+    ``,
     `This is an automated message from the centre check-in system.`,
   ].join("\n");
 
   try {
     const info = await transport.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
-      to: recipient,
+      to: recipients,
       subject,
       text,
       attachments: [
@@ -174,6 +196,7 @@ async function sendStaffWeekReport({ from, to, logs, overrideTo } = {}) {
       from,
       to,
       recipient,
+      recipients,
       count,
     };
   } catch (err) {
@@ -183,6 +206,7 @@ async function sendStaffWeekReport({ from, to, logs, overrideTo } = {}) {
       from,
       to,
       recipient,
+      recipients,
       count,
     };
   }
