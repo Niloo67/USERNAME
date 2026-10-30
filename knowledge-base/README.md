@@ -20,12 +20,15 @@ This is **research infrastructure**, not personalized financial advice.
 | 4 | [Signal philosophy](04-signal-philosophy.md) | How to use Trends/X without fooling yourself |
 | 5 | [System architecture](05-architecture.md) | The “big” stack: Cursor Automation + MCPs + knowledge base |
 | 6 | [30-day curriculum](06-curriculum-30-days.md) | Weekly reading/watching plan to build real literacy |
+| 7 | [Weekly decision framework](07-weekly-decision-framework.md) | Buy/hold/skip rules, size caps, learning tags |
 
 ## Related project files
 
+- `WEEKLY-WORKFLOW.md` — agentic Sun/Wed/Fri loop (start here for ops)
 - `.cursor/skills/portfolio-digest/SKILL.md` — agent operating rules for each digest run
-- `SETUP.md` — activate Wed/Fri email delivery
-- `automations/weekly-portfolio-digest.md` — paste-ready Cursor Automation prompt
+- `automations/weekly-decision-agent.md` — master pipeline prompt
+- `SETUP.md` — optional later: Automations + email
+- `automations/weekly-portfolio-digest.md` — paste-ready Cursor Automation prompt (email phase)
 - `digests/` — archived digest outputs
 
 ## Design principle
