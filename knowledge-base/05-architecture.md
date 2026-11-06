@@ -50,15 +50,17 @@ SETUP.md                 ← human activation checklist
 - [x] Knowledge base (sources, people, signals, architecture, curriculum)
 - [x] Executive research brief + 30-day learning plan
 - [x] **Hybrid Option C:** Wed/Fri digests via this Cloud Agent + `digests/` (see `HYBRID.md`)
+- [x] **Weekly Decision Agent:** Sun/Wed/Fri agentic loop (`WEEKLY-WORKFLOW.md`)
 - [ ] Connect Trends + Resend + FinancialMCP keys (optional until email phase)
 - [ ] Activate Cursor Automations email (deferred — Agents Window)
 - [ ] Phase 2: GitHub Pages dashboard (~1 month)
 
 ### Phase 2 — Quality loop (after 4+ digests)
 
-- Tag each digest idea later as hit / miss / early / wrong-regime in Memories
-- Add a “critic” paragraph: strongest bear case for every buy nudge
-- Expand watchlist tickers/sectors the agent always checks
+- [x] Decision framework with learning tags (`07-weekly-decision-framework.md`)
+- Tag each digest idea later as hit / miss / early / wrong-regime in Memories / Friday footer
+- Add a “critic” paragraph: strongest bear case for every buy nudge (required in Friday shopping list)
+- Expand watchlist tickers/sectors the agent always checks (world-theme scan)
 
 ### Phase 3 — Depth (optional, when you want “big”)
 
