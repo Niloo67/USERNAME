@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kumon NDG – Check-In / Check-Out</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand" id="centre-brand">Kumon NDG – Check-In / Check-Out<span>RFID tap · desk reader</span></div>
+      <nav class="nav">
+        <a href="/" class="active">Tap</a>
+        <a href="/roster.html">Roster</a>
+        <a href="/logs.html">Logs</a>
+        <a href="/settings.html">Settings</a>
+      </nav>
+    </header>
+
+    <div class="grid-2">
+      <section class="panel">
+        <h2>Tap student tag</h2>
+        <ol class="scanner-steps">
+          <li>Each student has an <strong>RFID/NFC tag</strong> on their folder.</li>
+          <li>Plug the <strong>USB reader</strong> into this computer (keyboard mode).</li>
+          <li>Tap the tag on the reader — check-in / check-out + parent email.</li>
+        </ol>
+
+        <div class="scanner-ready" id="scanner-ready">
+          <span class="pulse" aria-hidden="true"></span>
+          <span>Waiting for tag tap…</span>
+        </div>
+
+        <div class="mode-group" role="group" aria-label="Check-in mode">
+          <button type="button" class="mode-btn active" data-mode="auto">Auto</button>
+          <button type="button" class="mode-btn" data-mode="force_in">Force Check-In</button>
+          <button type="button" class="mode-btn" data-mode="force_out">Force Check-Out</button>
+        </div>
+
+        <label class="label" for="scan-input">Reader target (keep focused)</label>
+        <input
+          id="scan-input"
+          class="scan-box"
+          data-scan-input="1"
+          autocomplete="off"
+          autofocus
+          inputmode="none"
+          placeholder="Tap folder tag now"
+          aria-describedby="hid-hint"
+        />
+        <p class="hid-hint" id="hid-hint">
+          The USB reader types the tag number and presses Enter by itself.
+          You should not need to type at the desk.
+        </p>
+
+        <div id="feedback" class="feedback" aria-live="polite">
+          Tap a linked student tag on the USB reader
+        </div>
+
+        <div class="row" style="margin-top: 0.85rem;">
+          <button type="button" id="refocus-scan" class="secondary">Focus reader box</button>
+        </div>
+
+        <div class="manual-panel" id="manual-panel">
+          <h3>Manual check-in / check-out</h3>
+          <p class="muted">
+            For forgotten tags or staff punching in by name. Type a full name or last name, pick the person, then choose Check in or Check out.
+          </p>
+          <div class="field suggestions">
+            <label class="label" for="manual-search">Search by name</label>
+            <input id="manual-search" autocomplete="off" placeholder="e.g. Chen or Ava Chen…" />
+            <div id="suggestions" class="suggestions-list" role="listbox"></div>
+          </div>
+          <div id="manual-selected" class="manual-selected" hidden>
+            <div>
+              <strong id="manual-selected-name">—</strong>
+              <div class="muted" id="manual-selected-meta"></div>
+            </div>
+            <div class="row">
+              <button type="button" id="manual-check-in" class="btn-in">Check in</button>
+              <button type="button" id="manual-check-out" class="btn-out">Check out</button>
+              <button type="button" id="manual-clear" class="secondary">Clear</button>
+            </div>
+          </div>
+          <div class="field" style="margin-top: 0.85rem;">
+            <label class="label" for="manual-code">Or type student / staff ID</label>
+            <div class="row">
+              <input id="manual-code" autocomplete="off" placeholder="e.g. K-0001" style="flex: 1;" />
+              <button type="button" id="manual-submit" class="secondary">Find ID</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="row" style="justify-content: space-between; margin-bottom: 0.5rem;">
+          <h2 style="margin: 0;">Who is here</h2>
+          <span class="muted" id="active-count">0 students</span>
+        </div>
+        <ul id="active-list" class="list"></ul>
+        <p id="active-empty" class="muted">No students checked in yet.</p>
+      </section>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    (() => {
+      const { api, $, playTone, formatDuration, subjectTags, escapeHtml, attachGlobalScanner, toast } = Kumon;
+
+      let mode = "auto";
+      let busy = false;
+      let rosterCache = [];
+      let manualSelected = null;
+
+      const scanInput = $("#scan-input");
+      const feedback = $("#feedback");
+      const activeList = $("#active-list");
+      const activeEmpty = $("#active-empty");
+      const activeCount = $("#active-count");
+      const suggestions = $("#suggestions");
+      const manualSearch = $("#manual-search");
+      const readyBanner = $("#scanner-ready");
+      const manualSelectedBox = $("#manual-selected");
+
+      scanInput.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData("text") || "";
+        if (text.trim()) processCode(text.trim());
+      });
+
+      document.querySelectorAll(".mode-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          mode = btn.dataset.mode;
+          focusReader();
+        });
+      });
+
+      function focusReader() {
+        scanInput.placeholder = "Tap folder tag now";
+        scanInput.focus();
+        readyBanner.querySelector("span:last-child").textContent = "Waiting for tag tap…";
+      }
+
+      $("#refocus-scan").addEventListener("click", focusReader);
+
+      function clearManualSelection() {
+        manualSelected = null;
+        manualSelectedBox.hidden = true;
+        $("#manual-selected-name").textContent = "—";
+        $("#manual-selected-meta").textContent = "";
+      }
+
+      function selectManualPerson(s) {
+        manualSelected = s;
+        manualSelectedBox.hidden = false;
+        $("#manual-selected-name").textContent = s.name;
+        const bits = [s.studentCode];
+        if (s.isStaff) bits.push("Staff");
+        bits.push(s.isCheckedIn ? "currently in" : "currently out");
+        $("#manual-selected-meta").textContent = bits.join(" · ");
+        manualSearch.value = s.name;
+        suggestions.classList.remove("open");
+      }
+
+      function showFeedback(kind, title, detail) {
+        feedback.className = "feedback " + (kind || "");
+        feedback.innerHTML = `<div><strong>${escapeHtml(title)}</strong><div class="muted">${escapeHtml(detail || "")}</div></div>`;
+      }
+
+      async function loadSettingsBrand() {
+        try {
+          const s = await api("/api/settings");
+          const centre = s.centreName || "Kumon NDG Learning Centre";
+          $("#centre-brand").innerHTML =
+            `Kumon NDG – Check-In / Check-Out<span>${escapeHtml(centre)} · RFID tap</span>`;
+        } catch { /* ignore */ }
+      }
+
+      async function refreshActive() {
+        const data = await api("/api/active");
+        const students = data.students || [];
+        activeCount.textContent = `${students.length} student${students.length === 1 ? "" : "s"}`;
+        activeEmpty.style.display = students.length ? "none" : "block";
+        activeList.innerHTML = students
+          .map(
+            (s) => `
+          <li class="list-item" data-checked-in-at="${escapeHtml(s.checkedInAt || "")}">
+            <div>
+              <div class="name">${escapeHtml(s.name)}</div>
+              <div class="muted">${escapeHtml(s.studentCode)}${s.isStaff ? " · staff" : ""}${s.tagLinked ? " · tag linked" : ""}</div>
+              <div class="tags">${subjectTags(s.subjects)}</div>
+            </div>
+            <div class="row">
+              <span class="timer">${formatDuration(s.checkedInAt)}</span>
+              <button type="button" class="secondary checkout-btn" data-code="${escapeHtml(s.studentCode)}">Check out</button>
+            </div>
+          </li>`
+          )
+          .join("");
+      }
+
+      function tickTimers() {
+        activeList.querySelectorAll(".list-item").forEach((li) => {
+          const timer = li.querySelector(".timer");
+          if (timer) timer.textContent = formatDuration(li.dataset.checkedInAt);
+        });
+      }
+
+      async function processCode(code, overrideMode) {
+        const cleaned = String(code || "").trim();
+        if (!cleaned || busy) return;
+        busy = true;
+        readyBanner.querySelector("span:last-child").textContent = "Processing tap…";
+        try {
+          const result = await api("/api/scan", {
+            method: "POST",
+            body: JSON.stringify({ code: cleaned, mode: overrideMode || mode }),
+          });
+          playTone(result.action === "check_in" ? "in" : "out");
+          const emailNote =
+            result.email?.status === "sent"
+              ? "Parent email sent"
+              : result.email?.status === "failed"
+                ? `Email failed: ${result.email.detail}`
+                : result.email?.detail || "";
+          showFeedback(
+            result.action === "check_in" ? "ok" : "out",
+            result.message,
+            emailNote
+          );
+          toast(result.message);
+          await refreshActive();
+        } catch (err) {
+          if (err.status === 429) {
+            showFeedback("", "Hold on", err.message);
+          } else {
+            playTone("error");
+            showFeedback("err", "Tap failed", err.message);
+          }
+        } finally {
+          busy = false;
+          scanInput.value = "";
+          focusReader();
+        }
+      }
+
+      scanInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          processCode(scanInput.value);
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (e.target.closest("input, textarea, select, button, a, .suggestions-list, label")) return;
+        focusReader();
+      });
+      window.addEventListener("focus", () => setTimeout(focusReader, 50));
+      attachGlobalScanner((code) => processCode(code));
+
+      activeList.addEventListener("click", (e) => {
+        const btn = e.target.closest(".checkout-btn");
+        if (!btn) return;
+        processCode(btn.dataset.code, "force_out");
+      });
+
+      async function loadRoster() {
+        const data = await api("/api/students/directory");
+        rosterCache = data.students || [];
+      }
+
+      function renderSuggestions(q) {
+        const query = q.trim().toLowerCase();
+        if (!query) {
+          suggestions.classList.remove("open");
+          suggestions.innerHTML = "";
+          return;
+        }
+        const matches = rosterCache
+          .filter(
+            (s) =>
+              s.name.toLowerCase().includes(query) ||
+              s.studentCode.toLowerCase().includes(query)
+          )
+          .slice(0, 8);
+        if (!matches.length) {
+          suggestions.classList.remove("open");
+          suggestions.innerHTML = "";
+          return;
+        }
+        suggestions.innerHTML = matches
+          .map(
+            (s) => `
+          <button type="button" class="suggestion-item" data-code="${escapeHtml(s.studentCode)}">
+            <strong>${escapeHtml(s.name)}</strong>
+            <span class="muted"> · ${escapeHtml(s.studentCode)}${s.isStaff ? " · staff" : ""}${
+              s.isCheckedIn ? " · in centre" : ""
+            }</span>
+          </button>`
+          )
+          .join("");
+        suggestions.classList.add("open");
+      }
+
+      async function punchManual(forceMode) {
+        if (!manualSelected) {
+          toast("Pick a person from the search list first");
+          return;
+        }
+        await processCode(manualSelected.studentCode, forceMode);
+        await loadRoster();
+        const refreshed = rosterCache.find((s) => s.studentCode === manualSelected.studentCode);
+        if (refreshed) selectManualPerson(refreshed);
+      }
+
+      manualSearch.addEventListener("input", () => {
+        clearManualSelection();
+        renderSuggestions(manualSearch.value);
+      });
+      manualSearch.addEventListener("blur", () => setTimeout(() => suggestions.classList.remove("open"), 180));
+      suggestions.addEventListener("click", (e) => {
+        const btn = e.target.closest(".suggestion-item");
+        if (!btn) return;
+        const s = rosterCache.find((x) => x.studentCode === btn.dataset.code);
+        if (s) selectManualPerson(s);
+      });
+      $("#manual-check-in").addEventListener("click", () => punchManual("force_in"));
+      $("#manual-check-out").addEventListener("click", () => punchManual("force_out"));
+      $("#manual-clear").addEventListener("click", () => {
+        clearManualSelection();
+        manualSearch.value = "";
+        focusReader();
+      });
+      $("#manual-submit").addEventListener("click", () => {
+        const code = $("#manual-code").value.trim();
+        const s = rosterCache.find((x) => x.studentCode.toLowerCase() === code.toLowerCase());
+        if (s) {
+          selectManualPerson(s);
+          $("#manual-code").value = "";
+        } else {
+          toast("No match for that ID");
+        }
+      });
+      $("#manual-code").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          $("#manual-submit").click();
+        }
+      });
+
+      loadSettingsBrand();
+      loadRoster().catch(() => {});
+      refreshActive().catch((err) => showFeedback("err", "Cannot load active list", err.message));
+      focusReader();
+      setInterval(() => refreshActive().catch(() => {}), 3000);
+      setInterval(tickTimers, 1000);
+    })();
+  </script>
+</body>
+</html>
