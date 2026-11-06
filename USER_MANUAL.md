@@ -36,16 +36,18 @@ App address on the desk computer: **http://localhost:3001**
 
 1. Turn on the **Windows desk laptop**
 2. Plug in the **USB RFID reader**
-3. Open **PowerShell** (or use a desktop shortcut if you made one) and run:
+3. Open **PowerShell** and run:
 
 ```powershell
-cd path\to\rfid-checkin
+cd C:\Users\nazi42\Desktop\Kumon-NDG-Checkin\rfid-checkin
 npm start
 ```
 
 4. Open **Chrome** or **Edge**
 5. Go to: **http://localhost:3001**
 6. Leave the **Tap** page open all session
+
+Keep the PowerShell window open while the centre is open. To stop the app at the end of the day, click that window and press `Ctrl+C`.
 
 ### Quick reader check (if taps do nothing)
 
@@ -92,14 +94,54 @@ STAFF_PIN=your-secret-pin
 
 Repeat for each student.
 
-### C. Student leaves — reuse a tag
+### C. Edit a student / change a name
 
-1. Roster → **Select** the old student  
-2. Click **Unlink tag** (or Delete/deactivate the student)  
-3. **Select** the new student  
-4. Tap the same physical sticker → **Reassign tag**
+Use this when a name is misspelled, a student changes name, or you need to update parent email.
 
-### D. Turn on automatic cloud backup (do this once)
+1. Open **Roster** → enter Staff PIN  
+2. Find the person in **All students** (use the filter box if the list is long)  
+3. Click **Edit** next to their row  
+4. Change what you need:
+   - **Student name** — type the correct full name  
+   - Student ID, subjects, parent email/phone, Active, or Staff member  
+5. Click **Save**  
+6. Confirm the table shows the new name  
+
+**Notes**
+- Changing the **name** does **not** change their RFID tag — the same sticker still works.  
+- Past attendance in **Logs** keeps the name that was saved at the time of each tap (history is not rewritten).  
+- Click **Clear form** if you want to go back to adding a new person instead of editing.
+
+### D. Reassign a tag (move a sticker to another student)
+
+Use this when a student leaves and you reuse their folder sticker, or a tag was linked to the wrong person.
+
+#### Option 1 — Student left; give their tag to a new student
+
+1. Open **Roster** → Staff PIN  
+2. Find the **old** student → click **Select**  
+3. Click **Unlink tag** (or uncheck **Active** / delete if they are gone)  
+4. Add the **new** student if needed (**Save**), then click **Select** on the new student  
+5. Tap the physical sticker on the USB reader (in **Tap tag to link…**)  
+6. Click **Reassign tag**  
+7. Confirm the new student’s row shows that tag  
+
+#### Option 2 — Tag is still linked to someone else; move it now
+
+1. Roster → **Select** the student who should **own** the tag  
+2. Tap the sticker on the reader  
+3. Click **Reassign tag**  
+4. If the app says the tag belongs to someone else, confirm you want to **move** it  
+5. The old student will no longer have that tag; the selected student will  
+
+#### Option 3 — Wrong tag on a folder; start clean
+
+1. Select the student → **Unlink tag**  
+2. Tap the **correct** sticker → **Link tag**  
+
+After any reassign, do a quick test on the **Tap** page: tap the sticker once and confirm the **correct name** appears.
+
+### E. Turn on automatic cloud backup (do this once)
 
 So backups happen even if someone forgets:
 
@@ -312,7 +354,7 @@ You do **not** need Cursor on the Windows laptop.
 4. In PowerShell:
 
 ```powershell
-cd path\to\rfid-checkin
+cd C:\Users\nazi42\Desktop\Kumon-NDG-Checkin\rfid-checkin
 npm install
 npm start
 ```
@@ -325,7 +367,14 @@ Reader and tags stay the same.
 
 ## 15. Quick cheat sheet
 
-**Open app:** `npm start` → http://localhost:3001  
+**Launch app (PowerShell):**
+
+```powershell
+cd C:\Users\nazi42\Desktop\Kumon-NDG-Checkin\rfid-checkin
+npm start
+```
+
+Then open **http://localhost:3001**
 
 **Arrive:** tap folder → check in  
 
@@ -333,7 +382,13 @@ Reader and tags stay the same.
 
 **Forgot tag / staff punch:** Manual check-in / check-out → search name → Check in / Check out  
 
+**Change a name / edit student:** Roster → **Edit** → fix **Student name** (or email, etc.) → **Save**  
+
 **New student:** Roster → Save → Select → tap sticker → Link tag → stick on folder  
+
+**Reassign tag (student left):** Select old → Unlink tag → Select new → tap sticker → **Reassign tag**  
+
+**Move tag that’s still linked:** Select correct student → tap sticker → **Reassign tag** → confirm move  
 
 **New staff:** Roster → check Staff member → Save → punch by name on Tap  
 

@@ -4,10 +4,16 @@ Use this with the franchise **Baseline Requirements Checklist**. Annual certific
 
 ## Daily open
 
-1. Turn on the desk laptop and start the app (`npm start` in `qr-checkin` or `rfid-checkin`).
-2. Confirm Windows date/time is correct (entries must reflect **actual** arrival/departure).
-3. Open the Scan/Tap page in the browser; plug in the USB scanner or RFID reader.
-4. Test one known badge/tag in Notepad if the reader seems dead, then return to the app.
+1. Turn on the desk laptop. In **PowerShell**:
+
+```powershell
+cd C:\Users\nazi42\Desktop\Kumon-NDG-Checkin\rfid-checkin
+npm start
+```
+
+2. Open **http://localhost:3001** (Tap page). Plug in the USB RFID reader.
+3. Confirm Windows date/time is correct (entries must reflect **actual** arrival/departure).
+4. Test one known tag in Notepad if the reader seems dead, then return to the app.
 
 ## During class
 
@@ -21,7 +27,7 @@ Use this with the franchise **Baseline Requirements Checklist**. Annual certific
 
 Roster, Logs, and Settings require the **Staff PIN** (set `STAFF_PIN` in `.env` — do not leave `1234` in production).
 
-- Roster: add students, parent email, print QR badges / link RFID tags.
+- Roster: add/edit students (change name), parent email, link / unlink / **Reassign** RFID tags.
 - Logs: review history by date range; export CSV when needed.
 - Settings: centre name, email toggles, **Cloud backup folder** + automatic daily backup, franchise checklist.
 

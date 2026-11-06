@@ -13,7 +13,16 @@ npm install
 npm start
 ```
 
-Open `http://localhost:3001` (default port — different from the QR app)
+**This centre’s Windows laptop:**
+
+```powershell
+cd C:\Users\nazi42\Desktop\Kumon-NDG-Checkin\rfid-checkin
+npm start
+```
+
+Open `http://localhost:3001` (default port — different from the QR app).
+
+**Roster:** click **Edit** to change a student name; **Select** → tap sticker → **Reassign tag** to move a tag. Step-by-step: [USER_MANUAL.md](../USER_MANUAL.md) §4C–4D.
 
 ## What to buy (cheap starter kit)
 
