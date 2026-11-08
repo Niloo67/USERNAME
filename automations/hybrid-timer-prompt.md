@@ -15,9 +15,9 @@ Run the Weekly Decision Agent (Sunday week-ahead) for Niloo.
 
 Follow automations/weekly-decision-agent.md + WEEKLY-WORKFLOW.md + knowledge-base/07-weekly-decision-framework.md + portfolio-digest skill.
 
-1. Load knowledge-base/, WEEKLY-WORKFLOW.md, HYBRID.md, last digest.
+1. Load knowledge-base/, WEEKLY-WORKFLOW.md, HYBRID.md, automations/earnings-filings-pass.md, last digest.
 2. Sense: Yahoo prices for core + sleeve watchlist; Trends MCP (get_growth + Google Trends + X Trending). If Invalid API key → say auth/quota failed (never "not connected").
-3. Web research: week calendar (Fed, CPI, earnings, geopolitics) + AI/oil/copper themes.
+3. Web research: week calendar (Fed, CPI, earnings, geopolitics) + AI/oil/copper themes. Any tentative single-name lean must respect filings-pass gates (no options).
 4. Write digests/YYYY-MM-DD-week-ahead.md (week-ahead template from weekly-decision-agent.md).
 5. Commit, push, update PR.
 6. Paste the full brief in chat.

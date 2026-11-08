@@ -19,6 +19,7 @@ Before scoring ideas, read and follow:
 - `knowledge-base/05-architecture.md` — locked allocation policy
 - `knowledge-base/03-people-to-follow.md` — evidence-based framing (Felix / Bogleheads / Damodaran)
 - `automations/weekly-decision-agent.md` — full pipeline when running scheduled/on-demand
+- `automations/earnings-filings-pass.md` — FCF/capex/guidance + bull/bear before any **new single-name** buy (no options/calls; forecasts/sentiment are not buy signals)
 
 If paths differ (no-repo automation), apply the same hierarchy from memory: **allocation → regime → fundamentals → price → Trends/X**.
 
@@ -37,7 +38,8 @@ If paths differ (no-repo automation), apply the same hierarchy from memory: **al
 2. **Google Trends / search interest** — Always call Trends MCP (`get_growth` / `get_top_trends`) when the `trends-mcp` tool namespace is available. Prefer WoW/7D and 1M growth for watchlist keywords + live Google Trends / X boards.
 3. **X / social mentions** — Prefer Trends MCP `X (Twitter) Trending` board; add Grok/X MCP if present. Discount pure meme pumps.
 4. **Fundamentals / price context** — price vs 52w range, recent earnings/news, valuation sanity (PE vs peers when available), analyst or earnings catalysts
-5. **Cross-check** — only promote ideas where **trend/social attention + fundamentals + risk fit** align; flag conflicts explicitly
+5. **Filings pass (singles)** — before promoting any new single name, apply `automations/earnings-filings-pass.md` (FCF, capex/guide, one bull + one bear). Price-soft ≠ value-soft. No options.
+6. **Cross-check** — only promote ideas where **fundamentals + risk fit** are strong; Trends/X may support but never upgrade a weak filing/allocation fit
 
 If Trends MCP is listed but returns auth/quota errors (e.g. `Invalid API key`), say **auth/quota failed** — never “not connected.” Do not invent Trends scores.
 
