@@ -37,14 +37,14 @@ Run the Weekly Decision Agent (Wednesday midweek) for Niloo.
 
 Follow automations/weekly-decision-agent.md + WEEKLY-WORKFLOW.md + knowledge-base/07-weekly-decision-framework.md + portfolio-digest skill.
 
-1. Load knowledge-base/, WEEKLY-WORKFLOW.md, HYBRID.md, last digests.
+1. Load knowledge-base/, WEEKLY-WORKFLOW.md, HYBRID.md, automations/earnings-filings-pass.md, last digests.
 2. Sense: live Yahoo prices; Trends MCP first. Auth/quota failed if key errors — never "not connected".
-3. Short regime + theme check (oil, rates, AI power/hardware).
+3. Short regime + theme check (oil, rates, AI power/hardware/copper). No defense. New singles only if filings-pass clears.
 4. Write digests/YYYY-MM-DD-midweek.md in EASY-READ skill format (one sentence, do/skip tables, short context — no dense price dumps).
 5. Commit, push, update PR.
 6. Paste the full digest in chat.
-7. Refresh timers if near expiry.
-8. Rules: max 5 do-rows; always include skips; not financial advice; never invent prices; never mention age.
+7. Refresh timers if near expiry (unsubscribe + re-subscribe; dedupe does NOT extend expiry).
+8. Rules: max 5 do-rows; always include skips; not financial advice; never invent prices; never mention age. Price-soft is not value-soft. No options.
 ```
 
 ---
@@ -59,19 +59,19 @@ Run the Weekly Decision Agent (Friday decision report) for Niloo.
 
 Follow automations/weekly-decision-agent.md + WEEKLY-WORKFLOW.md + knowledge-base/07-weekly-decision-framework.md + portfolio-digest skill.
 
-1. Load knowledge-base/, WEEKLY-WORKFLOW.md, HYBRID.md, prior midweek + last Friday.
-2. Sense: full Yahoo watchlist; Trends MCP; web research on regime + world themes.
-3. Decide: Core / Sleeve / Skip with size caps. Include world-theme scan (oil, AI hardware, AI power, copper, defense). Optional CMPS only as tiny curiosity.
+1. Load knowledge-base/, WEEKLY-WORKFLOW.md, HYBRID.md, automations/earnings-filings-pass.md, prior midweek + last Friday + digests/2026-10-18-correction-valuation.md.
+2. Sense: full Yahoo watchlist; Trends MCP; web research on regime + world themes; filings pass on any new single-name sleeve.
+3. Decide: Core / Sleeve / Skip with size caps. Include world-theme scan (oil, AI hardware, AI power, copper, grid). No military/defense. No options/calls. Optional CMPS only as tiny curiosity.
 4. Write digests/YYYY-MM-DD-eow.md with:
    - Easy-read one sentence + do/skip tables
    - Explained shopping list (what / why / how much / what could go wrong)
-   - What worked / didn’t
+   - What worked / didn't
    - Learning tags vs prior week when possible
    - Look at next
 5. Commit, push, update PR.
 6. Paste the FULL report in chat (explanations included — Niloo finds short tables alone too thin).
-7. Refresh Sun/Wed/Fri timers.
-8. Rules: not financial advice; no leverage/options/pennies; never invent prices; never mention age; speculative biotech ≤1.5%.
+7. Refresh Sun/Wed/Fri timers (unsubscribe + re-subscribe; dedupe does NOT extend expiry).
+8. Rules: not financial advice; no leverage/options/pennies; never invent prices; never mention age; speculative biotech ≤1.5%. Price-soft is not value-soft.
 ```
 
 ---
@@ -88,11 +88,11 @@ Run the Must-buy alert agent for Niloo.
 Follow automations/must-buy-alert.md + knowledge-base/07-weekly-decision-framework.md + last digest.
 
 1. Sense: Yahoo prices for VFV.TO VCN.TO XEF.TO GOOGL MSFT COPX CCJ ETN + oil/AI context; Trends if available (auth/quota failed if key errors).
-2. Decide strictly: is anything a true MUST BUY today? Prefer "No must-buy today."
+2. Decide strictly: is anything a true MUST BUY today? Prefer "No must-buy today." Apply filings-pass + price-soft≠value-soft before any single-name MUST BUY.
 3. If MUST BUY: write digests/YYYY-MM-DD-must-buy.md, commit, push, update PR; paste short alert in chat (max 3 tickers + size tip + bear case one line each).
 4. If none: paste only one short chat line: "No must-buy today. Keep funding VFV/VCN/XEF on schedule." Do not invent urgency.
-5. Refresh Sun/Wed/Fri + must-buy timers if near expiry.
-6. Rules: not financial advice; no defense; no leverage/options/pennies; never invent prices; never mention age.
+5. Refresh Sun/Wed/Fri + must-buy timers if near expiry (unsubscribe + re-subscribe; dedupe does NOT extend expiry).
+6. Rules: not financial advice; no defense; no leverage/options/pennies; never invent prices; never mention age. Price-soft is not value-soft.
 ```
 
 ---
