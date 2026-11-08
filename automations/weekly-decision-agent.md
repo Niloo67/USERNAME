@@ -15,8 +15,9 @@ Always label: **not financial advice**.
 3. `knowledge-base/04-signal-philosophy.md`
 4. `knowledge-base/05-architecture.md`
 5. `.cursor/skills/portfolio-digest/SKILL.md`
-6. Last 1–2 files in `digests/` (continuity + learning tags)
-7. `HYBRID.md` (delivery constraints)
+6. `automations/earnings-filings-pass.md` — FCF/capex/guidance gate before any new single-name sleeve buy (no options)
+7. Last 1–2 files in `digests/` (continuity + learning tags)
+8. `HYBRID.md` (delivery constraints)
 
 ## Pipeline (agentic steps — do in order)
 
@@ -29,7 +30,9 @@ Always label: **not financial advice**.
 ### Step B — Reason
 Apply hierarchy: allocation → regime → fundamentals → price → attention.  
 Run world-theme scan from `WEEKLY-WORKFLOW.md`.  
-Score candidates; write one bear case per buy idea.
+For any **new single-name** promote: run **filings pass** (FCF, capex, guide, bull/bear) — see `earnings-filings-pass.md`.  
+Score candidates; write one bear case per buy idea.  
+Never recommend options/calls/leverage (reject viral “desk bought calls” patterns).
 
 ### Step C — Decide
 Fill three buckets: **Core / Sleeve / Skip**.  

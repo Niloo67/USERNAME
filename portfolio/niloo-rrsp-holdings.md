@@ -67,6 +67,7 @@ Visible weights sum ≈ **94.8%** (+ cash ≈ 5%).
 |------|---------|
 | `portfolio/niloo-rrsp-holdings.md` | **This file** — raw RRSP holdings only |
 | `digests/2026-10-08-rrsp-balance-review.md` | Personalized RRSP advice from this snapshot |
+| `digests/2026-11-08-rrsp-whats-down.md` | Personalized “what’s down / $2k cash” (post AI correction) |
 | `portfolio/niloo-tfsa-holdings.md` | Separate TFSA snapshot (do not mix) |
 | `digests/YYYY-MM-DD-*.md` | **Generic** buy/hold digests |
 

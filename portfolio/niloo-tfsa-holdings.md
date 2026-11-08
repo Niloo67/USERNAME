@@ -67,6 +67,7 @@ Visible weights sum ≈ **92.9%** (+ cash ≈ 5%). Minor gaps may be tiny lots o
 |------|---------|
 | `portfolio/niloo-tfsa-holdings.md` | **This file** — raw holdings only |
 | `digests/2026-10-08-tfsa-balance-review.md` | Personalized advice from this snapshot |
+| `digests/2026-11-08-tfsa-whats-down.md` | Personalized “what’s down / $2k cash” (post AI correction) |
 | `digests/YYYY-MM-DD-*.md` | **Generic** buy/hold digests (any balanced-growth reader) |
 
 When Niloo asks about “my TFSA” again, load this snapshot first, then write a new personalized note — do not rewrite the generic digest.
