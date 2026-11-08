@@ -14,19 +14,43 @@ Inspired by open-source “AI desk” stacks (Dexter, yfinance, edgartools, FinR
 | Fact-check every number to a source | Sentiment / price forecasts as buy signals |
 | Yahoo / filings / IR as Tier 1–2 data | “$82 → $1,200 in a week” as a repeatable model |
 
-Reference post (marketing claim, not a template): `https://x.com/mika_systems/status/2118770148374905287`
+Reference post / video UI: `https://x.com/mika_systems/status/2118770148374905287`  
+(Screenshots saved under conversation assets — “earnings-desk” graph is a **demo UI**, not required software.)
+
+## Pipeline shown in the video (overnight loop)
+
+```text
+dexter (plan)
+  → yfinance (prices / earnings dates)
+  → FinGPT (headline sentiment)          ← attention only for us
+  → ai-berkshire (committee debate)      ← BULL vs BEAR / READER
+  → FinRobot (write-up)
+  → FinanceToolkit (ratios)              ← nice-to-have, not required
+  → nixtla TimeGPT (forecasts)           ← do NOT drive buys
+  → quant-mind (index facts)
+  → edgartools (read 10-K / 10-Q / 8-K) ← core for us
+  → ai-financial-agent (fact check)
+  → ≤3 picks
+```
+
+Demo artifacts named in the UI: `research_plan.md`, `earnings_dates.csv`, `premarket_sentiment.json`, `committee_votes.md`, `equity_report.pdf`, `ratios.parquet`, `revenue_forecast.csv`, `filings_index.db`, `filings_214.jsonl`, `fact_check.md`.
+
+**Important:** the flashy graph + star counts are presentation. The durable idea is **ordered research with filings + adversarial debate + fact check**. We already do that in digests; this file makes the gate explicit. **No calls/options.**
 
 ## Role map → this repo
 
-| Desk role | Tool examples (optional) | Our agent step |
-|-----------|--------------------------|----------------|
-| Data desk | yfinance / Yahoo chart API | Already in Sense (prices) |
-| Filings clerk | SEC EDGAR, company IR, edgartools | **This pass** — FCF, capex, guide |
-| Researcher | Dexter-style plan | Weekly Decision Agent pipeline |
-| Committee | Bull / bear personas | Bear case rule + verdict |
-| Fact checker | Primary sources only | Never invent prices / Trends |
-| News / FinGPT | Headlines | Attention only (bottom of hierarchy) |
-| TimeGPT forecasts | — | **Do not** use for buy decisions |
+| Desk role (video) | Tool examples (optional) | Our agent step |
+|-------------------|--------------------------|----------------|
+| 01 Researcher | Dexter | Weekly Decision Agent plan |
+| 02 Data desk | yfinance / Yahoo chart API | Sense (prices) — already |
+| 03 News reader | FinGPT | Attention only (bottom of hierarchy) |
+| 04 Committee | ai-berkshire (BULL/BEAR) | Bear case + verdict every buy |
+| 05 Report writer | FinRobot | Friday explained shopping list |
+| 06 Math desk | FinanceToolkit | Optional ratios; never invent |
+| 07 Forecaster | nixtla TimeGPT | **Do not** use for buy decisions |
+| 08 Librarian | quant-mind | Optional; digests + KB memory |
+| 09 Filings clerk | edgartools / SEC / IR | **This pass** — FCF, capex, guide |
+| 10 Fact checker | ai-financial-agent | Source every number; no vibes |
 
 ## When to run
 
