@@ -7,6 +7,7 @@ Prioritize **primary** sources, then reputable aggregators. Use social/trends la
 | Source | Use for | URL |
 |--------|---------|-----|
 | **SEC EDGAR** | 10-K / 10-Q / 8-K filings, insider Form 4 | https://www.sec.gov/edgar |
+| **edgartools** (optional Python) | Programmatic 8-K / 10-K pulls for filings pass | https://github.com/dgunning/edgartools |
 | **FRED** | Rates, CPI, unemployment, Fed policy series | https://fred.stlouisfed.org |
 | **BLS** | CPI, jobs, PPI | https://www.bls.gov |
 | **Treasury / Fed** | Yield curve, policy statements | https://www.treasury.gov / federalreserve.gov |
@@ -17,6 +18,7 @@ Prioritize **primary** sources, then reputable aggregators. Use social/trends la
 | Source | Use for | Notes |
 |--------|---------|-------|
 | **Yahoo Finance** | Quotes, history, basic fundamentals, news | Free; good agent default |
+| **yfinance** (optional Python) | Same Yahoo data in scripts | https://github.com/ranaroussi/yfinance |
 | **Google Finance** | Quick quotes / comparison | Cross-check |
 | **TradingView** | Charts, breadth, idea discovery | Free tier enough; treat “ideas” as social |
 | **Finviz** | Screening (value, momentum, sector), heatmaps | Best free US visual scan |
