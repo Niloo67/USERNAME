@@ -11,11 +11,15 @@ Research what looks attractive to buy or hold for a **growth-balanced** investor
 
 Before scoring ideas, read and follow:
 
+- `WEEKLY-WORKFLOW.md` — agentic weekly loop + human checklist
+- `knowledge-base/07-weekly-decision-framework.md` — buy/hold/skip rules + size caps
 - `knowledge-base/00-executive-research-brief.md` — setup + source priorities
 - `knowledge-base/04-signal-philosophy.md` — Trends/X are attention sensors, not buy signals
 - `knowledge-base/02-data-sources.md` — Tier 1–2 for facts; Tier 3 for attention
 - `knowledge-base/05-architecture.md` — locked allocation policy
 - `knowledge-base/03-people-to-follow.md` — evidence-based framing (Felix / Bogleheads / Damodaran)
+- `automations/weekly-decision-agent.md` — full pipeline when running scheduled/on-demand
+- `automations/earnings-filings-pass.md` — FCF/capex/guidance + bull/bear before any **new single-name** buy (no options/calls; forecasts/sentiment are not buy signals)
 
 If paths differ (no-repo automation), apply the same hierarchy from memory: **allocation → regime → fundamentals → price → Trends/X**.
 
@@ -26,6 +30,7 @@ If paths differ (no-repo automation), apply the same hierarchy from memory: **al
 - Prefer liquid ETFs + quality large/mid-caps; avoid leverage, penny stocks, and pure hype
 - Single-name satellite sleeve capped at ~20–25% of equities
 - Not personalized financial advice; label ideas as research hypotheses
+- Default digests are **generic**. Only load `portfolio/` (TFSA / RRSP holdings) when she asks about an account; write personalized notes as `digests/*-tfsa-*.md` or `*-rrsp-*.md`, never rewrite the generic buy report into a personal one, and never mix accounts
 
 ## Data gathering order
 
@@ -33,7 +38,8 @@ If paths differ (no-repo automation), apply the same hierarchy from memory: **al
 2. **Google Trends / search interest** — Always call Trends MCP (`get_growth` / `get_top_trends`) when the `trends-mcp` tool namespace is available. Prefer WoW/7D and 1M growth for watchlist keywords + live Google Trends / X boards.
 3. **X / social mentions** — Prefer Trends MCP `X (Twitter) Trending` board; add Grok/X MCP if present. Discount pure meme pumps.
 4. **Fundamentals / price context** — price vs 52w range, recent earnings/news, valuation sanity (PE vs peers when available), analyst or earnings catalysts
-5. **Cross-check** — only promote ideas where **trend/social attention + fundamentals + risk fit** align; flag conflicts explicitly
+5. **Filings pass (singles)** — before promoting any new single name, apply `automations/earnings-filings-pass.md` (FCF, capex/guide, one bull + one bear). Price-soft ≠ value-soft. No options.
+6. **Cross-check** — only promote ideas where **fundamentals + risk fit** are strong; Trends/X may support but never upgrade a weak filing/allocation fit
 
 If Trends MCP is listed but returns auth/quota errors (e.g. `Invalid API key`), say **auth/quota failed** — never “not connected.” Do not invent Trends scores.
 
@@ -88,12 +94,19 @@ Fuller wrap:
 1. Week in markets
 2. What trends/social got right vs wrong
 3. Updated balanced portfolio actions (buy / hold / trim)
-4. Watchlist for next week
-5. Memory update: what to track next run
+4. **Explained shopping list** (what / why / how much / bear case) — required Friday
+5. World-theme scan (oil, AI hardware, AI power, copper, defense)
+6. Watchlist for next week
+7. Learning tags vs prior week when possible
+
+### Sunday week-ahead (optional third timer)
+
+Calendar + themes to watch + tentative leans — see `automations/weekly-decision-agent.md`.
 
 ## Output format (keep it easy to read)
 
 Write for a busy human. Short sentences. Few tables. No jargon unless you explain it in plain words.
+**Friday exception:** after the short tables, add a longer explained shopping list — Niloo finds tables-alone too thin.
 
 ```text
 # Midweek check-in — Mon DD, YYYY
